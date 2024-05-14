@@ -12,5 +12,5 @@ const client = new DiscordClient({
 });
 
 (async () => {
-	await client.login(process.env.BOT_TOKEN);
+	client.init();
 })();
