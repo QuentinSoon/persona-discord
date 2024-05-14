@@ -1,4 +1,5 @@
 import { IntentsBitField } from 'discord.js';
+import 'dotenv/config';
 import DiscordClient from './modules/DiscordClient';
 
 const client = new DiscordClient({
