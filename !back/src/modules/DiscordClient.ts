@@ -59,26 +59,6 @@ export default class DiscordClient extends Client {
 			}
 		}
 
-		// for (const file of files) {
-		// 	const stat = await fs.lstat(path.join(filePath, file));
-		// 	if (stat.isDirectory()) {
-		// 		const subFiles: any = await this.getFiles(path.join(dir, file));
-		// 		fileList.push(...subFiles);
-		// 	} else if (file.endsWith('.ts') || file.endsWith('.js')) {
-		// 		fileList.push(path.join(dir, file));
-		// 	}
-		// }
-
-		// for (const file of files) {
-		// 	const stat = await fs.lstat(path.join(filePath, file));
-		// 	if (stat.isDirectory()) {
-		// 		const subFiles: any = await this.getFiles(path.join(dir, file));
-		// 		fileList.push(...subFiles);
-		// 	} else {
-		// 		fileList.push(path.join(dir, file));
-		// 	}
-		// }
-
 		return fileList;
 	}
 
