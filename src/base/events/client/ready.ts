@@ -12,6 +12,7 @@ export default class Ready extends BaseEvent {
 	}
 
 	execute() {
-		console.log(`${this.client.user?.tag} is ready!`);
+		// console.log(this.client);
+		// console.log(`${this.client.user?.tag} is ready!`);
 	}
 }

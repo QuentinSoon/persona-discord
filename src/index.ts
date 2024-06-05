@@ -1,5 +1,6 @@
 import { IntentsBitField } from 'discord.js';
 import 'dotenv/config';
+import fs from 'fs';
 import DiscordClient from './base/utils/DiscordClient';
 
 const client = new DiscordClient({
@@ -13,4 +14,8 @@ const client = new DiscordClient({
 
 (async () => {
 	client.Init();
+
+	console.log('Registering events...');
+	const files = fs.readFileSync('../events/client/ready.ts', 'utf-8');
+	console.log(files);
 })();
