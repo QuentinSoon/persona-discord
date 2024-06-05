@@ -16,5 +16,5 @@ export class BaseEvent implements IEvent {
 		this.once = options.once;
 	}
 
-	Execute(...args: any[]): void {}
+	execute(...args: any[]): void {}
 }
