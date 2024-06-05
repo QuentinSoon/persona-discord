@@ -3,7 +3,7 @@ import { IEvent } from '../interface/IEvent';
 import { IEventOption } from '../interface/IEventOptions';
 import DiscordClient from '../utils/DiscordClient';
 
-export class Event implements IEvent {
+export class BaseEvent implements IEvent {
 	client: DiscordClient;
 	name: Events;
 	description: string;

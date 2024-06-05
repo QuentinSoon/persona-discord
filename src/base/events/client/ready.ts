@@ -1,8 +1,8 @@
 import { Events } from 'discord.js';
-import { Event } from '../../classes/Event';
+import { BaseEvent } from '../../classes/BaseEvent';
 import DiscordClient from '../../utils/DiscordClient';
 
-export class Ready extends Event {
+export class Ready extends BaseEvent {
 	constructor(client: DiscordClient) {
 		super(client, {
 			name: Events.ClientReady,
@@ -11,7 +11,7 @@ export class Ready extends Event {
 		});
 	}
 
-	Execute(...args: any[]): void {
+	Execute() {
 		console.log(`${this.client.user?.tag} is ready!`);
 	}
 }
