@@ -54,8 +54,8 @@ export async function registerEvents(client: DiscordClient, dir: string = '') {
 		if (file.endsWith('.js') || file.endsWith('.ts')) {
 			const { default: Event } = await import(path.join(dir, file));
 			const event = new Event();
-			client.events.set(event.getName(), event);
-			client.on(event.getName(), event.run.bind(event, client));
+			client.events.set(event.name, event);
+			client.on(event.name, event.run.bind(event, client));
 		}
 	}
 }
