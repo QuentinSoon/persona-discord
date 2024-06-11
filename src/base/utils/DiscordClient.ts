@@ -1,4 +1,5 @@
 import { Client, ClientOptions, Collection } from 'discord.js';
+import { glob } from 'glob';
 import { BaseEvent } from '../classes/BaseEvent';
 import { GuildConfigurationType } from '../classes/GuildConfiguration.class';
 import { IClient } from '../interface/IClient';
@@ -38,22 +39,13 @@ export default class DiscordClient extends Client implements IClient {
 		guilds.forEach((config) => this.configs.set(config.guildId, config));
 	}
 	RegisterEvents(): void {
-		registerEvents(this, '../events');
+		registerEvents(this);
 	}
 	RegisterCommands(): void {}
 }
 
-export async function registerEvents(client: DiscordClient, dir: string = '') {
-	// const filePath = path.join(__dirname, dir);
-	// const files = await fs.readdir(filePath);
-	// for (const file of files) {
-	// 	const stat = await fs.lstat(path.join(filePath, file));
-	// 	if (stat.isDirectory()) registerEvents(client, path.join(dir, file));
-	// 	if (file.endsWith('.js') || file.endsWith('.ts')) {
-	// 		const { default: Event } = await import(path.join(dir, file));
-	// 		const event = new Event();
-	// 		client.events.set(event.name, event);
-	// 		client.on(event.name, event.execute.bind(event, client));
-	// 	}
-	// }
+export function registerEvents(client: DiscordClient) {
+	const eventFiles = glob.
+
+	console.log(eventFiles);
 }
