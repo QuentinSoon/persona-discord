@@ -37,7 +37,6 @@ export const loadEvents = async (client: DiscordClient) => {
 	}
 };
 
-// Fait comme pour loadEvents mais pour les commandes
 export const loadCommands = async (client: DiscordClient) => {
 	const files = await loadFiles('./src/commands/');
 	for (const file of files) {
@@ -82,6 +81,23 @@ export const loadCommands = async (client: DiscordClient) => {
 	await addGuildsCommands(list);
 };
 
+export const loadMessages = async (client: DiscordClient) => {
+	const files = await loadJsonFiles('./src/messages/');
+	for (const file of files) {
+		// prendre le nom du fichier et enlever l'extension .json
+		const langue = file.replace('.json', '');
+		// console.log(langue);
+		const messages = (await import(`../messages/${file}`)).default; // accès direct à la propriété default
+		// recuperer tous les messages du fichier et en faire une map
+		const messageMap = new Map<string, string>();
+		for (const message in messages) {
+			messageMap.set(message, messages[message]);
+		}
+		client.translations.set(langue, messageMap);
+		console.log(`Loaded ${langue} messages.`);
+	}
+};
+
 export const loadFiles = async (dir: string): Promise<string[]> => {
 	const getTsFiles = async (
 		dir: string,
@@ -97,6 +113,35 @@ export const loadFiles = async (dir: string): Promise<string[]> => {
 				await getTsFiles(filePath, fileList);
 			} else if (file.endsWith('.ts')) {
 				fileList.push(filePath);
+			}
+		}
+
+		return fileList;
+	};
+	try {
+		const tsFiles = await getTsFiles(dir);
+		return tsFiles;
+	} catch (err) {
+		console.error(`Error reading directory ${dir}:`, err);
+		throw err;
+	}
+};
+
+export const loadJsonFiles = async (dir: string): Promise<string[]> => {
+	const getTsFiles = async (
+		dir: string,
+		fileList: string[] = []
+	): Promise<string[]> => {
+		const files = await fs.promises.readdir(dir);
+
+		for (const file of files) {
+			const filePath = path.join(dir, file);
+			const stat = await fs.promises.stat(filePath);
+
+			if (stat.isDirectory()) {
+				await getTsFiles(filePath, fileList);
+			} else if (file.endsWith('.json')) {
+				fileList.push(file);
 			}
 		}
 

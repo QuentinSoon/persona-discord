@@ -2,10 +2,10 @@ import { Collection, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
 import DiscordClient from './client/DiscordClient';
 import { GuildsType, GuildType } from './interface/Guild.interface';
-import { loadEvents } from './loaders/loader';
+import { loadCommands, loadEvents, loadMessages } from './loaders/loader';
 import { getGuilds } from './utils/sql/Guild.sql';
 
-const client = new DiscordClient({
+export const client = new DiscordClient({
 	intents: [
 		IntentsBitField.Flags.Guilds,
 		IntentsBitField.Flags.GuildMessages,
@@ -39,6 +39,7 @@ const client = new DiscordClient({
 	}
 
 	await loadEvents(client);
-	// await loadCommands(client);
+	await loadCommands(client);
+	await loadMessages(client);
 	await client.login(process.env.BOT_TOKEN);
 })();

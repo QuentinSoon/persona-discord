@@ -8,6 +8,7 @@ export default class DiscordClient extends Client {
 	private _configs = new Collection<string, GuildType>();
 	private _events = new Collection<string, DiscordEvent>();
 	private _commands = new Collection<string, DiscordCommmand>();
+	private _translations: Map<string, Map<string, string>> = new Map();
 
 	constructor(options: ClientOptions) {
 		super(options);
@@ -43,5 +44,13 @@ export default class DiscordClient extends Client {
 
 	set commands(commands: Collection<string, DiscordCommmand>) {
 		this._commands = commands;
+	}
+
+	get translations(): Map<string, Map<string, string>> {
+		return this._translations;
+	}
+
+	set translations(messages: Map<string, Map<string, string>>) {
+		this._translations = messages;
 	}
 }
