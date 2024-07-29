@@ -4,6 +4,7 @@ import DiscordClient from './client/DiscordClient';
 import { GuildsType, GuildType } from './interface/Guild.interface';
 import { loadCommands, loadEvents } from './loaders/loader';
 import { getGuilds } from './utils/sql/Guild.sql';
+import { supabase } from './utils/supabase/supabase';
 
 const client = new DiscordClient({
 	intents: [
@@ -23,6 +24,17 @@ const client = new DiscordClient({
 			config.set(guild.guild_id, guild);
 		});
 		client.configs = config;
+
+		supabase
+			.channel('guilds')
+			.on(
+				'postgres_changes',
+				{ event: 'UPDATE', schema: 'public', table: 'guilds' },
+				(payload) => {
+					client.configs.set(payload.new.guildId, payload.new as GuildType);
+				}
+			)
+			.subscribe();
 	} catch (error) {
 		console.error(error);
 	}

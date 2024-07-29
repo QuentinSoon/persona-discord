@@ -9,6 +9,9 @@ export default class OptimiseEvent extends DiscordEvent {
 	}
 
 	async execute(client: DiscordClient, message: DiscordMessage) {
-		await message.reply('Hello World!');
+		await message.replyE('Hello World!');
+
+		const guild = await message.guildIdIIIII();
+		console.log(guild);
 	}
 }
