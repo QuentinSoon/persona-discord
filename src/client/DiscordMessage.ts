@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { Message, User } from 'discord.js';
 import DiscordClient from './DiscordClient';
 
 export default class DiscordMessage {
@@ -10,8 +10,11 @@ export default class DiscordMessage {
 		}
 	}
 
-	async guildIdIIIII() {
-		console.log('eee');
-		// return this.message.guildId;
+	getAuthor(): User {
+		return this.message.author;
+	}
+
+	getGuildId(): string | null {
+		return this.message.guildId;
 	}
 }
