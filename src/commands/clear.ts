@@ -1,6 +1,7 @@
-import { Interaction, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import DiscordClient from '../client/DiscordClient';
 import DiscordCommmand from '../client/DiscordCommand';
+import DiscordCommandInteraction from '../client/DiscordCommandInteraction';
 
 export default class ClearCommand extends DiscordCommmand {
 	constructor() {
@@ -11,8 +12,7 @@ export default class ClearCommand extends DiscordCommmand {
 		);
 	}
 
-	async execute(client: DiscordClient, interaction: Interaction) {
-		if (!interaction.isCommand()) return;
-		// await deleteAllGuildsCommands();
+	async execute(client: DiscordClient, interaction: DiscordCommandInteraction) {
+		await interaction.reply('ok');
 	}
 }
