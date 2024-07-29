@@ -1,5 +1,7 @@
+import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
+import { addGuildsCommands } from '../api/rest';
 import DiscordClient from '../client/DiscordClient';
 import DiscordCommmand from '../client/DiscordCommand';
 import DiscordEvent from '../client/DiscordEvent';
@@ -52,18 +54,32 @@ export const loadCommands = async (client: DiscordClient) => {
 		}
 		const command = new Command();
 		if (command instanceof DiscordCommmand) {
-			// client.commands.set(command.name, command);
-			// if (command.once) {
-			// 	client.once(command.name, command.register.bind(command, client));
-			// } else {
-			// 	client.on(command.name, command.register.bind(command, client));
-			// }
+			client.commands.set(command.data.name, command);
 		} else {
 			console.error(
 				`Command from file ${file} is not an instance of DiscordCommand`
 			);
 		}
 	}
+	// get all slashcommand and get json body
+	const list: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+	client.commands.forEach((command) => {
+		// list.push(command.data.toJSON());
+		if (!command.data.name || typeof command.data.name !== 'string') {
+			console.error('Command name is invalid:', command.data.name);
+		} else if (
+			!command.data.description ||
+			typeof command.data.description !== 'string'
+		) {
+			console.error(
+				'Command description is invalid:',
+				command.data.description
+			);
+		} else {
+			list.push(command.data.toJSON());
+		}
+	});
+	await addGuildsCommands(list);
 };
 
 export const loadFiles = async (dir: string): Promise<string[]> => {

@@ -1,22 +1,16 @@
-import { SharedSlashCommandOptions } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import DiscordClient from './DiscordClient';
 
 export default abstract class DiscordCommmand {
-	private _name: string;
-	private _option: SharedSlashCommandOptions<any>;
+	private _data: SlashCommandBuilder;
 
-	constructor(name: string, option: SharedSlashCommandOptions<any>) {
-		this._name = name;
-		this._option = option;
+	constructor(slashCommand: SlashCommandBuilder) {
+		this._data = slashCommand;
 	}
 
 	abstract execute(client: DiscordClient, ...args: any[]);
 
-	get name(): string {
-		return this._name;
-	}
-
-	get option(): SharedSlashCommandOptions<any> {
-		return this._option;
+	get data(): SlashCommandBuilder {
+		return this._data;
 	}
 }
