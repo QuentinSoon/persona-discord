@@ -1,7 +1,6 @@
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
-import { addGuildsCommands } from '../api/rest';
 import DiscordClient from '../client/DiscordClient';
 import DiscordCommmand from '../client/DiscordCommand';
 import DiscordEvent from '../client/DiscordEvent';
@@ -78,24 +77,7 @@ export const loadCommands = async (client: DiscordClient) => {
 			list.push(command.data.toJSON());
 		}
 	});
-	await addGuildsCommands(list);
-};
-
-export const loadMessages = async (client: DiscordClient) => {
-	const files = await loadJsonFiles('./src/messages/');
-	for (const file of files) {
-		// prendre le nom du fichier et enlever l'extension .json
-		const langue = file.replace('.json', '');
-		// console.log(langue);
-		const messages = (await import(`../messages/${file}`)).default; // accès direct à la propriété default
-		// recuperer tous les messages du fichier et en faire une map
-		const messageMap = new Map<string, string>();
-		for (const message in messages) {
-			messageMap.set(message, messages[message]);
-		}
-		client.translations.set(langue, messageMap);
-		console.log(`Loaded ${langue} messages.`);
-	}
+	// await addGuildsCommands(list);
 };
 
 export const loadFiles = async (dir: string): Promise<string[]> => {

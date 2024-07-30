@@ -3,6 +3,7 @@ import DiscordClient from '../client/DiscordClient';
 import DiscordCommmand from '../client/DiscordCommand';
 import DiscordEvent from '../client/DiscordEvent';
 import { GuildType } from '../interface/Guild.interface';
+import { onButtonClick } from '../modules/setup/events/buttons';
 
 export default class InteractionEvent extends DiscordEvent {
 	constructor() {
@@ -26,6 +27,23 @@ export default class InteractionEvent extends DiscordEvent {
 			if (!discordGuild) return;
 
 			await command.execute(client, guild, discordGuild, interaction);
+		}
+		if (interaction.isButton()) {
+			const buttonId = interaction.customId;
+			if (!buttonId) return;
+
+			const guild: Guild | null = interaction.guild;
+			if (!guild) return;
+
+			// const button: DiscordButton | undefined = client.buttons.get(buttonId);
+			// if (!button) return;
+
+			const discordGuild: GuildType | undefined = client.configs.get(guild.id);
+			if (!client.configs.has(guild.id)) return;
+			if (!discordGuild) return;
+
+			// await button.execute(client, guild, discordGuild, interaction);
+			await onButtonClick(client, guild, discordGuild, interaction);
 		}
 	}
 }

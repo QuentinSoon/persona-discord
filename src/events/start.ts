@@ -1,4 +1,4 @@
-import { Events } from 'discord.js';
+import { ActivityType, Events } from 'discord.js';
 import DiscordClient from '../client/DiscordClient';
 import DiscordEvent from '../client/DiscordEvent';
 
@@ -8,6 +8,12 @@ export default class StartEvent extends DiscordEvent {
 	}
 
 	async execute(client: DiscordClient) {
-		console.log(`Logged in as ${client.user?.tag}!`);
+		if (!client.user) return;
+
+		console.log(`Logged in as ${client.user.tag}!`);
+
+		client.user.setActivity("Persona.app - Lify's Shard", {
+			type: ActivityType.Watching,
+		});
 	}
 }
