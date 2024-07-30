@@ -1,11 +1,13 @@
 import {
 	ChatInputCommandInteraction,
+	Guild,
 	PermissionsBitField,
 	SlashCommandBuilder,
 	TextChannel,
 } from 'discord.js';
 import DiscordClient from '../../client/DiscordClient';
 import DiscordCommmand from '../../client/DiscordCommand';
+import { GuildType } from '../../interface/Guild.interface';
 
 export default class ClearCommand extends DiscordCommmand {
 	constructor() {
@@ -27,6 +29,8 @@ export default class ClearCommand extends DiscordCommmand {
 
 	async execute(
 		client: DiscordClient,
+		guild: Guild,
+		discordGuild: GuildType,
 		interaction: ChatInputCommandInteraction
 	) {
 		const number = interaction.options.getInteger('number');
@@ -42,23 +46,11 @@ export default class ClearCommand extends DiscordCommmand {
 			const channel = interaction.channel as TextChannel;
 			if (!channel) return;
 
-			if (channel.messages.cache.size <= number) {
-				await interaction.reply({
-					content: `🔰 Le channel est deja vide.`,
-					ephemeral: true,
-				});
-				return;
-			}
-
 			const listmessages = await channel.messages.fetch({ limit: number });
 			await channel.bulkDelete(listmessages);
 
 			await interaction.reply({
-				content: `🔰 Tres bien, je supprime ${number} messages. ${
-					channel.messages.cache.size <= listmessages.size
-						? 'Le channel est vide désormais.'
-						: ''
-				}`,
+				content: `🔰 Tres bien, je supprime ${number} messages.`,
 				ephemeral: true,
 			});
 		} catch (error: any) {

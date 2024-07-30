@@ -5,6 +5,7 @@ export const GuildSchema = z.object({
 	created_at: z.string(),
 	guild_id: z.string(),
 	prefix: z.string(),
+	language: z.string(),
 });
 export type GuildType = z.infer<typeof GuildSchema>;
 
