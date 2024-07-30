@@ -1,6 +1,10 @@
 import axios from 'axios';
 import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
 	ChatInputCommandInteraction,
+	EmbedBuilder,
 	Guild,
 	PermissionsBitField,
 	SlashCommandBuilder,
@@ -8,8 +12,8 @@ import {
 } from 'discord.js';
 import DiscordClient from '../client/DiscordClient';
 import DiscordCommmand from '../client/DiscordCommand';
+import DiscordModular from '../client/DiscordModular';
 import { GuildType } from '../interface/Guild.interface';
-import Panel from '../modules/panel';
 
 export default class SetupCommand extends DiscordCommmand {
 	constructor() {
@@ -29,7 +33,7 @@ export default class SetupCommand extends DiscordCommmand {
 	) {
 		await interaction.deferReply({ fetchReply: true, ephemeral: true });
 
-		const panel = new Panel(client, guild, discordGuild, interaction);
+		// const panel = new Panel(client, guild, discordGuild, interaction);
 
 		// await interaction.editReply({
 		// 	content: '🔬 Analyse de la configuration ...',
@@ -43,31 +47,34 @@ export default class SetupCommand extends DiscordCommmand {
 		// 	components: [],
 		// });
 
-		// await interaction.editReply({
-		// 	content: '',
-		// 	embeds: [
-		// 		new EmbedBuilder()
-		// 			.setTitle('Initialisation de Persona')
-		// 			.setDescription(
-		// 				`Hello <@${interaction.user.id}> 👋 \n\n` +
-		// 					'Je suis Persona, un bot avancé de modération \n' +
-		// 					'automatique et manuelle conçu pour les \n' +
-		// 					'petites, moyennes et grandes communautés. \n\n' +
-		// 					'Pour commencer, clique sur le bouton ci-dessous\n' +
-		// 					'pour configurer ton serveur.'
-		// 			)
-		// 			.setThumbnail(client.user!.avatarURL())
-		// 			.setColor('#f8e5fe'),
-		// 	],
-		// 	components: [
-		// 		new ActionRowBuilder<ButtonBuilder>().addComponents(
-		// 			new ButtonBuilder()
-		// 				.setLabel('Configurer Persona')
-		// 				.setStyle(ButtonStyle.Primary)
-		// 				.setCustomId('configure')
-		// 		),
-		// 	],
-		// });
+		const button = new DiscordModular()
+			.setLabel('Configurer Persona')
+			.setStyle(ButtonStyle.Primary)
+			.setId('configured')
+			.onClick((interaction) => {
+				console.log('Button clicked!');
+			});
+
+		await interaction.editReply({
+			content: '',
+			embeds: [
+				new EmbedBuilder()
+					.setTitle('Initialisation de Persona')
+					.setDescription(
+						`Hello <@${interaction.user.id}> 👋 \n\n` +
+							'Je suis Persona, un bot avancé de modération \n' +
+							'automatique et manuelle conçu pour les \n' +
+							'petites, moyennes et grandes communautés. \n\n' +
+							'Pour commencer, clique sur le bouton ci-dessous\n' +
+							'pour configurer ton serveur.'
+					)
+					.setThumbnail(client.user!.avatarURL())
+					.setColor('#f8e5fe'),
+			],
+			components: [
+				new ActionRowBuilder<ButtonBuilder>().addComponents(button.build()),
+			],
+		});
 	}
 }
 
