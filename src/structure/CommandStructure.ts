@@ -1,24 +1,20 @@
 import {
-	Guild,
+	CommandInteraction,
 	SlashCommandBuilder,
 	SlashCommandOptionsOnlyBuilder,
 } from 'discord.js';
-import { GuildType } from '../interface/Guild.interface';
-import DiscordClient from './DiscordClient';
+import DiscordClient from '../client/DiscordClient';
 
-export default abstract class DiscordCommmand {
+export default abstract class CommandStructure {
 	private _data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
 
-	constructor(
-		slashCommand: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder
-	) {
-		this._data = slashCommand;
+	constructor(command: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder) {
+		this._data = command;
 	}
 
 	abstract execute(
 		client: DiscordClient,
-		guild: Guild,
-		discordGuild: GuildType,
+		interaction: CommandInteraction,
 		...args: any[]
 	);
 

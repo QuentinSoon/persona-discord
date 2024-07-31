@@ -1,47 +1,55 @@
-import { Client, ClientOptions, Collection } from 'discord.js';
-import { GuildType } from '../interface/Guild.interface';
-import DiscordCommmand from './DiscordCommand';
-import DiscordEvent from './DiscordEvent';
+import { ActivityType, Client, Collection, IntentsBitField } from 'discord.js';
+import 'dotenv/config';
+import CommandStructure from '../structure/CommandStructure';
+import CommandsHandler from './handler/CommandsHandler';
+import CommandsListener from './handler/CommandsListener';
+import EventsHandler from './handler/EventsHandler';
 
 export default class DiscordClient extends Client {
-	private _prefix: string = '!';
-	private _configs = new Collection<string, GuildType>();
-	private _events = new Collection<string, DiscordEvent>();
-	private _commands = new Collection<string, DiscordCommmand>();
+	collection = {
+		application_commands: new Collection<string, CommandStructure>(),
+	};
+	rest_application_commands_array = <any[]>[];
 
-	constructor(options: ClientOptions) {
-		super(options);
+	commands_handler = new CommandsHandler(this);
+	events_handler = new EventsHandler(this);
+
+	constructor() {
+		super({
+			intents: [
+				IntentsBitField.Flags.Guilds,
+				IntentsBitField.Flags.GuildMessages,
+				IntentsBitField.Flags.GuildMembers,
+				IntentsBitField.Flags.MessageContent,
+			],
+			presence: {
+				activities: [
+					{
+						name: "Persona.app - Lify's Shard",
+						type: ActivityType.Custom,
+					},
+				],
+				status: 'online',
+			},
+		});
+
+		new CommandsListener(this);
 	}
 
-	get prefix(): string {
-		return this._prefix;
-	}
+	connect = async () => {
+		console.log(`Attempting to connect to the Discord bot...`);
 
-	set prefix(prefix: string) {
-		this._prefix = prefix;
-	}
+		try {
+			await this.login(process.env.BOT_TOKEN);
 
-	get configs(): Collection<string, GuildType> {
-		return this._configs;
-	}
+			await this.commands_handler.load();
+			await this.events_handler.load();
 
-	set configs(configs: Collection<string, GuildType>) {
-		this._configs = configs;
-	}
+			await this.commands_handler.registerApplicationCommands();
 
-	get events(): Collection<string, DiscordEvent> {
-		return this._events;
-	}
-
-	set events(events: Collection<string, DiscordEvent>) {
-		this._events = events;
-	}
-
-	get commands(): Collection<string, DiscordCommmand> {
-		return this._commands;
-	}
-
-	set commands(commands: Collection<string, DiscordCommmand>) {
-		this._commands = commands;
-	}
+			console.log('Successfully connected to the Discord bot');
+		} catch (err) {
+			console.log('Failed to connect to the Discord bot');
+		}
+	};
 }
