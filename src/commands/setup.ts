@@ -8,22 +8,32 @@ import {
 import DiscordClient from '../client/DiscordClient';
 import CommandStructure from '../structure/CommandStructure';
 
-export default class PingCommand extends CommandStructure {
+export default class SetupCommand extends CommandStructure {
 	constructor() {
 		super(
-			new SlashCommandBuilder().setName('ping').setDescription('Ping pong')
+			new SlashCommandBuilder()
+				.setName('setupmdr')
+				.setNameLocalizations({
+					fr: 'setup',
+					'en-US': 'setup',
+				})
+				.setDescription('Configurer et éditeur de configuration')
+				.setDescriptionLocalizations({
+					fr: 'Configurer et éditeur de configuration',
+					'en-US': 'Setup and configuration editor',
+				}),
+			'panel:confirmeDelete'
 		);
 	}
 
 	async execute(client: DiscordClient, interaction: CommandInteraction) {
-		const pingValue = client.ws.ping;
 		await interaction.reply({
-			content: `Pong! (${pingValue}ms)`,
+			content: `Pong! (ms)`,
 			ephemeral: true,
 			components: [
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder()
-						.setCustomId('panel:show')
+						.setCustomId('panel:selectorModule')
 						.setLabel('Ping')
 						.setStyle(ButtonStyle.Primary)
 				),

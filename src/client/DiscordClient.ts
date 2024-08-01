@@ -1,5 +1,6 @@
 import { ActivityType, Client, Collection, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
+import PanelModule from '../modules/panel/panel';
 import CommandStructure from '../structure/CommandStructure';
 import CommandsHandler from './handler/CommandsHandler';
 import CommandsListener from './handler/CommandsListener';
@@ -13,6 +14,8 @@ export default class DiscordClient extends Client {
 
 	commands_handler = new CommandsHandler(this);
 	events_handler = new EventsHandler(this);
+
+	panel = new PanelModule(this);
 
 	constructor() {
 		super({
@@ -45,7 +48,7 @@ export default class DiscordClient extends Client {
 			await this.commands_handler.load();
 			await this.events_handler.load();
 
-			await this.commands_handler.registerApplicationCommands();
+			// await this.commands_handler.registerApplicationCommands();
 
 			console.log('Successfully connected to the Discord bot');
 		} catch (err) {
