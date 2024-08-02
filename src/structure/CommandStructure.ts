@@ -1,21 +1,12 @@
-import {
-	CommandInteraction,
-	SlashCommandBuilder,
-	SlashCommandOptionsOnlyBuilder,
-} from 'discord.js';
+import { CommandInteraction } from 'discord.js';
+import CommandBuilder from '../builder/CommandBuilder';
 import DiscordClient from '../client/DiscordClient';
 
 export default abstract class CommandStructure {
-	private _data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
-	private _customId: string | undefined;
+	private _data: CommandBuilder;
 
-	// add customId to command in slash command
-	constructor(
-		command: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder,
-		customId: string | undefined = undefined
-	) {
+	constructor(command: CommandBuilder) {
 		this._data = command;
-		this._customId = customId;
 	}
 
 	abstract execute(
@@ -24,11 +15,7 @@ export default abstract class CommandStructure {
 		...args: any[]
 	);
 
-	get data(): SlashCommandBuilder | SlashCommandOptionsOnlyBuilder {
+	get data(): CommandBuilder {
 		return this._data;
-	}
-
-	get customId(): string | undefined {
-		return this._customId;
 	}
 }

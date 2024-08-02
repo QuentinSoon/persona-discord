@@ -3,6 +3,7 @@ import {
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
+	Interaction,
 } from 'discord.js';
 import DiscordClient from '../../client/DiscordClient';
 import ModuleStructure from '../../structure/ModuleStructure';
@@ -34,7 +35,9 @@ export default class PanelModule extends ModuleStructure {
 		});
 	};
 
-	confirmeDelete = (interaction: ButtonInteraction) => {
+	confirmeDelete = (interaction: Interaction) => {
+		if (!(interaction.isButton() || interaction.isChatInputCommand())) return;
+		console.log('OK');
 		// const modal = new ModalBuilder()
 		// 	.setCustomId('myModal')
 		// 	.setTitle('My Modal');

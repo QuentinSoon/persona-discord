@@ -3,16 +3,14 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	CommandInteraction,
-	SlashCommandBuilder,
 } from 'discord.js';
+import CommandBuilder from '../builder/CommandBuilder';
 import DiscordClient from '../client/DiscordClient';
 import CommandStructure from '../structure/CommandStructure';
 
 export default class PingCommand extends CommandStructure {
 	constructor() {
-		super(
-			new SlashCommandBuilder().setName('ping').setDescription('Ping pong')
-		);
+		super(new CommandBuilder().setName('ping').setDescription('Ping pong'));
 	}
 
 	async execute(client: DiscordClient, interaction: CommandInteraction) {
@@ -23,7 +21,7 @@ export default class PingCommand extends CommandStructure {
 			components: [
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder()
-						.setCustomId('panel:show')
+						.setCustomId('panel:confirmeDelete')
 						.setLabel('Ping')
 						.setStyle(ButtonStyle.Primary)
 				),
