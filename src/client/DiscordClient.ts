@@ -1,6 +1,7 @@
 import { ActivityType, Client, Collection, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
 import PanelModule from '../modules/panel/panel';
+import TicketModule from '../modules/ticket/ticket';
 import CommandStructure from '../structure/CommandStructure';
 import CommandsHandler from './handler/CommandsHandler';
 import CommandsListener from './handler/CommandsListener';
@@ -16,6 +17,8 @@ export default class DiscordClient extends Client {
 	events_handler = new EventsHandler(this);
 
 	panel = new PanelModule(this);
+
+	ticket = new TicketModule(this);
 
 	constructor() {
 		super({

@@ -1,6 +1,4 @@
-import { ChatInputCommandInteraction } from 'discord.js';
 import CommandBuilder from '../builder/CommandBuilder';
-import DiscordClient from '../client/DiscordClient';
 import CommandStructure from '../structure/CommandStructure';
 
 export default class SetupCommand extends CommandStructure {
@@ -43,24 +41,7 @@ export default class SetupCommand extends CommandStructure {
 					uk: 'Конфігурація та редактор конфігурацій',
 					vi: 'Cấu hình và biên tập cấu hình',
 				})
-				.addModule('panel:confirmeDelete')
+				.addModule('panel:start')
 		);
-	}
-
-	async execute(
-		client: DiscordClient,
-		interaction: ChatInputCommandInteraction
-	) {
-		const command: CommandStructure | undefined =
-			client.collection.application_commands.get(interaction.commandName);
-		if (!command) return;
-
-		console.log(command.data.modules);
-		await interaction.reply({
-			content: `OK`,
-			ephemeral: true,
-			embeds: [],
-			components: [],
-		});
 	}
 }

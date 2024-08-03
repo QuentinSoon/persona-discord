@@ -11,7 +11,7 @@ export default class CommandsListener {
 			if (!command) return;
 
 			try {
-				// if (command.customId) return;
+				if (command.data.modules) return;
 				await command.execute(client, interaction);
 			} catch (err) {
 				console.log(err);

@@ -21,9 +21,9 @@ export default class PingCommand extends CommandStructure {
 			components: [
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder()
-						.setCustomId('panel:confirmeDelete')
 						.setLabel('Ping')
 						.setStyle(ButtonStyle.Primary)
+						.setCustomId('panel:showModal')
 				),
 			],
 		});

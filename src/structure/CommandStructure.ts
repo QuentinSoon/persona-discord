@@ -9,11 +9,11 @@ export default abstract class CommandStructure {
 		this._data = command;
 	}
 
-	abstract execute(
+	execute(
 		client: DiscordClient,
 		interaction: CommandInteraction,
 		...args: any[]
-	);
+	): void {}
 
 	get data(): CommandBuilder {
 		return this._data;
