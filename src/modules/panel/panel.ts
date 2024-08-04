@@ -24,14 +24,9 @@ export default class PanelModule extends ModuleStructure {
 				new EmbedBuilder()
 					.setTitle('Initialisation de Persona')
 					.setDescription(
-						`Salut <@${interaction.user.id}> 👋 \n` +
-							'Je suis Persona, un bot avancé de modération \n' +
-							'automatique et manuelle conçu pour les \n' +
-							'petites, moyennes et grandes communautés. \n\n' +
-							'Je suis là pour vous aider à maintenir un \n' +
-							'environnement sûr et agréable. Pour commencer \n' +
-							'la configuration, appuyez simplement sur \n' +
-							'le bouton ci-dessous.'
+						`Salut <@${interaction.user.id}> ! 👋 \n` +
+							'Persona est un bot avancé de modération automatique et manuelle, conçu pour les petites, moyennes et grandes communautés.\n\n' +
+							'Persona est là pour vous aider à maintenir un environnement sûr et agréable. Pour commencer la configuration, veuillez appuyer sur le bouton ci-dessous.'
 					)
 					.setThumbnail(client.user!.avatarURL())
 					.setFooter({
@@ -53,27 +48,15 @@ export default class PanelModule extends ModuleStructure {
 
 	showModules = async (
 		client: DiscordClient,
-		interaction: ButtonInteraction | ChatInputCommandInteraction
+		interaction: ButtonInteraction
 	) => {
-		await interaction.reply({
-			ephemeral: true,
+		await interaction.update({
 			embeds: [
 				new EmbedBuilder()
 					.setTitle('Initialisation de Persona')
 					.setDescription(
-						'Je possède un grands nombres de \n' +
-							"modules vous permettant l'optimiser votre \n" +
-							'serveur. Pour des meilleurs performances, il \n' +
-							'est recommander de ne pas utiliser plusieurs \n' +
-							'bot possedant les memes fonctionnalités. \n' +
-							'\n' +
-							'**Module Tickets:** \n' +
-							'Le module tickets permet a vos utilisateurs \n' +
-							"de créer des tickets pour demander de l'aide \n" +
-							'ou signaler un problème. \n' +
-							'\n' +
-							'Clique sur le module ci-dessous pour \n' +
-							'le configurer.'
+						'Persona propose un large éventail de modules pour optimiser votre serveur. Pour des performances optimales, il est recommandé de ne pas utiliser plusieurs bots offrant les mêmes fonctionnalités.\n\n' +
+							'Cliquez sur un module ci-dessous pour commencer la configuration de celui-ci.'
 					)
 					.setThumbnail(client.user!.avatarURL())
 					.setFooter({
