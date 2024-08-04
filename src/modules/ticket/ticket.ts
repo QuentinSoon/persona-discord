@@ -6,11 +6,16 @@ import {
 	ChannelSelectMenuBuilder,
 	ChannelType,
 	EmbedBuilder,
+	ModalActionRowComponentBuilder,
+	ModalBuilder,
+	ModalSubmitInteraction,
 	StringSelectMenuInteraction,
+	TextInputBuilder,
+	TextInputStyle,
 } from 'discord.js';
 import DiscordClient from '../../client/DiscordClient';
 import ModuleStructure from '../../structure/ModuleStructure';
-import { supabase } from '../../utils/supabase';
+import { supabase } from '../../utils/SUPABASE';
 
 export default class TicketModule extends ModuleStructure {
 	constructor(client: DiscordClient) {
@@ -45,16 +50,64 @@ export default class TicketModule extends ModuleStructure {
 					new ButtonBuilder()
 						.setLabel('Commencer la Configuration')
 						.setStyle(ButtonStyle.Success)
-						.setCustomId('ticket:selectTextChannel')
+						.setCustomId('ticket:showModal')
 				),
 			],
 		});
+	};
+
+	showModal = async (client: DiscordClient, interaction: ButtonInteraction) => {
+		await interaction.showModal(
+			new ModalBuilder()
+				.setTitle('Configurer le module de tickets')
+				.setCustomId('ticket:selectTextChannel')
+				.addComponents(
+					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+						new TextInputBuilder()
+							.setLabel('Nom du template')
+							.setCustomId('ticket-modal-title')
+							.setPlaceholder('Support')
+							.setStyle(TextInputStyle.Short)
+							.setRequired(true)
+					),
+					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+						new TextInputBuilder()
+							.setLabel('Description du template')
+							.setCustomId('ticket-modal-description')
+							.setPlaceholder('Ticket pour le support utilisateur du serveur.')
+							.setStyle(TextInputStyle.Paragraph)
+							.setRequired(false)
+					)
+				)
+		);
 	};
 
 	selectTextChannel = async (
 		client: DiscordClient,
 		interaction: ButtonInteraction
 	) => {
+		const id = interaction.guildId;
+
+		if (interaction.isModalSubmit()) {
+			const int: ModalSubmitInteraction = interaction;
+
+			if (!id) return;
+			const { data, error } = await supabase
+				.from('ticket_guilds')
+				.insert([
+					{
+						guild_id: id,
+						name: int.fields.getTextInputValue('ticket-modal-title'),
+						description: int.fields.getTextInputValue(
+							'ticket-modal-description'
+						),
+						text_channel_id: 'otherValue',
+						forum_channel_id: 'otherValue',
+					},
+				])
+				.select();
+		}
+
 		await interaction.update({
 			embeds: [
 				new EmbedBuilder()
@@ -94,25 +147,6 @@ export default class TicketModule extends ModuleStructure {
 		client: DiscordClient,
 		interaction: StringSelectMenuInteraction
 	) => {
-		const id = interaction.guildId;
-		if (!id) return;
-
-		const { data, error } = await supabase
-			.from('ticket_guilds')
-			.insert([
-				{
-					guild_id: id,
-					name: 'otherValue',
-					description: 'otherValue',
-					text_channel_id: 'otherValue',
-					forum_channel_id: 'otherValue',
-				},
-			])
-			.select();
-
-		console.log(data);
-		console.log(error);
-
 		await interaction.update({
 			embeds: [
 				new EmbedBuilder()
