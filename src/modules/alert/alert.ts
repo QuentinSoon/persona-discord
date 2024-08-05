@@ -5,6 +5,9 @@ import {
 	ButtonInteraction,
 	ButtonStyle,
 	Channel,
+	ChannelSelectMenuBuilder,
+	ChannelSelectMenuInteraction,
+	ChannelType,
 	EmbedBuilder,
 	ModalActionRowComponentBuilder,
 	ModalBuilder,
@@ -21,7 +24,7 @@ import {
 	AlertType,
 } from '../../interface/Alert.interface';
 import ModuleStructure from '../../structure/ModuleStructure';
-import { getData, setData } from '../../utils/data';
+import { getData, setData, updateData } from '../../utils/data';
 
 export default class AlertModule extends ModuleStructure {
 	constructor(client: DiscordClient) {
@@ -80,7 +83,6 @@ export default class AlertModule extends ModuleStructure {
 					embeds: [
 						new EmbedBuilder()
 							.setTitle(data.title)
-							.setDescription(alert.description ?? 'Aucune description')
 							.setURL(`https://twitch.tv/${username}`)
 							.setImage(thumbnail_url)
 							.addFields(
@@ -155,7 +157,7 @@ export default class AlertModule extends ModuleStructure {
 		await interaction.showModal(
 			new ModalBuilder()
 				.setTitle('Ajouter une nouvelle alerte')
-				.setCustomId('alert:confirmAlert')
+				.setCustomId('alert:selectTextChannel')
 				.addComponents(
 					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
 						new TextInputBuilder()
@@ -177,18 +179,21 @@ export default class AlertModule extends ModuleStructure {
 		);
 	};
 
-	confirmAlert = async (
+	selectTextChannel = async (
 		client: DiscordClient,
 		interaction: ButtonInteraction
 	) => {
 		const id = interaction.guildId;
 
 		if (interaction.isModalSubmit()) {
-			const int: ModalSubmitInteraction = interaction;
-			const twitchUsername = int.fields.getTextInputValue('alert-modal-title');
-			const twitchDescription = int.fields.getTextInputValue(
+			const field: ModalSubmitInteraction = interaction;
+			const twitchUsername =
+				field.fields.getTextInputValue('alert-modal-title');
+			const twitchDescription = field.fields.getTextInputValue(
 				'alert-modal-description'
 			);
+
+			if (!twitchUsername || !twitchDescription) return;
 
 			try {
 				const result: AlertsType = await getData(client, 'alerts');
@@ -204,112 +209,61 @@ export default class AlertModule extends ModuleStructure {
 						type: 'twitch',
 					},
 				]);
-
-				// const data = await supabase
-				// 	.from('alerts')
-				// 	.insert({
-				// 		guild_id: id,
-				// 		name: twitchUsername,
-				// 		description: twitchDescription,
-				// 		type: 'twitch',
-				// 	})
-				// 	.select();
-
-				// console.log('Data inserted successfully:', data.data);
-
-				// // await client.redis.set(
-				// // 	'alerts',
-				// // 	JSON.stringify([
-				// // 		...result,
-				// // 		{
-				// // 			name: twitchUsername,
-				// // 			description: twitchDescription,
-				// // 			type: 'twitch',
-				// // 		},
-				// // 	])
-				// // );
 			} catch (error) {
 				console.log('Error occurred:', error);
 			}
-
-			// if (!id) return;
-			// const { data, error } = await supabase
-			// 	.from('alerts')
-			// 	.insert([
-			// 		{
-			// 			name: twitchUsername,
-			// 			description: twitchDescription,
-			// 			type: 'twitch',
-			// 		},
-			// 	])
-			// 	.select();
-
-			// await client.redis.set(
-			// 	'alerts',
-			// 	JSON.stringify({
-			// 		name: twitchUsername,
-			// 		description: twitchDescription,
-			// 		type: 'twitch',
-			// 	})
-			// );
-
-			// console.log('test');
-			// const result = await client.redis.get('alerts');
-			// if (!result) {
-			// 	console.log('No alert found');
-			// }
-
-			// const newO = {
-			// 	name: twitchUsername,
-			// 	description: twitchDescription,
-			// 	type: 'twitch',
-			// };
-
-			// try {
-			// 	// Récupérer la liste existante
-			// 	const alerts = await client.redis.get('alerts');
-
-			// 	let alertsArray;
-			// 	if (alerts) {
-			// 		alertsArray = JSON.parse(alerts);
-			// 	} else {
-			// 		alertsArray = [];
-			// 	}
-
-			// 	// Ajouter le nouvel objet à la liste
-			// 	alertsArray.push(newO);
-
-			// 	// Stocker la liste mise à jour dans Redis
-			// 	await client.redis.set('alerts', JSON.stringify(alertsArray));
-			// 	console.log('JSON data cached successfully:', alertsArray);
-			// } catch (error) {
-			// 	console.error('Error setting JSON data in Redis:', error);
-			// }
-			// await client.redis.set(
-			// 	'alerts',
-			// 	JSON.stringify({
-			// 		name: twitchUsername,
-			// 		description: twitchDescription,
-			// 		type: 'twitch',
-			// 	})
-			// );
-
-			// console.log('Alert found');
 		}
 
-		// await interaction.update({
-		// 	embeds: [
-		// 		new EmbedBuilder()
-		// 			.setTitle("Configurer le module d'alerte")
-		// 			.setDescription("✅ La configuration d'une alert est terminée.")
-		// 			.setThumbnail(client.user!.avatarURL())
-		// 			.setFooter({
-		// 				text: 'Persona.app - Discord Bot',
-		// 				iconURL: client.user!.avatarURL() as string,
-		// 			})
-		// 			.setColor('#f8e5fe'),
-		// 	],
-		// 	components: [],
-		// });
+		await interaction.update({
+			embeds: [
+				new EmbedBuilder()
+					.setTitle("Configurer le module d'alerte")
+					.setDescription('Selectionnez un salon qui recevra les alertes.')
+					.setThumbnail(client.user!.avatarURL())
+					.setFooter({
+						text: 'Persona.app - Discord Bot',
+						iconURL: client.user!.avatarURL() as string,
+					})
+					.setColor('#f8e5fe'),
+			],
+			components: [
+				new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+					new ChannelSelectMenuBuilder()
+						.setCustomId('alert:confirmAlert')
+						.setPlaceholder('Selectionnez un salon textuel')
+						.setChannelTypes(
+							ChannelType.GuildAnnouncement | ChannelType.GuildText
+						)
+						.setDefaultChannels([])
+				),
+				new ActionRowBuilder<ButtonBuilder>().addComponents(
+					new ButtonBuilder()
+						.setLabel('Retour')
+						.setStyle(ButtonStyle.Secondary)
+						.setCustomId('alert:start')
+				),
+			],
+		});
+	};
+
+	confirmAlert = async (
+		client: DiscordClient,
+		interaction: ChannelSelectMenuInteraction
+	) => {
+		const id = interaction.guildId;
+		if (!id) return;
+		const channel = interaction.values[0];
+		console.log(channel);
+
+		await updateData(
+			client,
+			'alerts',
+			[
+				{
+					channel_id: channel,
+				},
+			],
+			id
+		);
 	};
 }

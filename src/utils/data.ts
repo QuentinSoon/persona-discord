@@ -33,3 +33,21 @@ export const setData = async (
 		console.log('Error occurred:', error);
 	}
 };
+
+export const updateData = async (
+	client: DiscordClient,
+	key: string,
+	value: any,
+	guild_id: string
+) => {
+	try {
+		const data = await supabase
+			.from(key)
+			.update(value)
+			.eq('guild_id', guild_id);
+		console.log('Data updated successfully:', data);
+		const adding = await client.redis.set(key, JSON.stringify(value));
+	} catch (error) {
+		console.log('Error occurred:', error);
+	}
+};
