@@ -11,7 +11,7 @@ export const getData = async (client: DiscordClient, key: string) => {
 			}
 
 			const adding = await client.redis.set(key, JSON.stringify(data));
-			console.log('JSON data cached successfully:', adding);
+			console.log('JSON data cached successfully :', adding);
 			result = JSON.stringify(data);
 		}
 		return JSON.parse(result);
