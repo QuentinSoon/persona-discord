@@ -70,7 +70,11 @@ export default class PanelModule extends ModuleStructure {
 					new ButtonBuilder()
 						.setLabel('Tickets (Non configurer)')
 						.setStyle(ButtonStyle.Danger)
-						.setCustomId('ticket:start')
+						.setCustomId('ticket:start'),
+					new ButtonBuilder()
+						.setLabel('Alertes (Non configurer)')
+						.setStyle(ButtonStyle.Danger)
+						.setCustomId('alert:start')
 				),
 			],
 		});
