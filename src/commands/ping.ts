@@ -1,31 +1,27 @@
-import {
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-	CommandInteraction,
-} from 'discord.js';
-import CommandBuilder from '../builder/CommandBuilder';
+import { CommandInteraction } from 'discord.js';
 import DiscordClient from '../client/DiscordClient';
-import CommandStructure from '../structure/CommandStructure';
+import { SlashCommandBuilder } from '../components/builders/commands';
+import { SlashCommandComponent } from '../components/commands/commands';
 
-export default class PingCommand extends CommandStructure {
+export default class PingCommand extends SlashCommandComponent {
 	constructor() {
-		super(new CommandBuilder().setName('ping').setDescription('Ping pong'));
+		super(
+			new SlashCommandBuilder().setName('ping').setDescription('Ping pong')
+		);
 	}
 
 	async execute(client: DiscordClient, interaction: CommandInteraction) {
+		if (!interaction.guild) return;
 		const pingValue = client.ws.ping;
 		await interaction.reply({
 			content: `Pong! (${pingValue}ms)`,
 			ephemeral: true,
-			components: [
-				new ActionRowBuilder<ButtonBuilder>().addComponents(
-					new ButtonBuilder()
-						.setLabel('Ping')
-						.setStyle(ButtonStyle.Primary)
-						.setCustomId('panel:showModal')
-				),
-			],
+			components: [],
 		});
+
+		const rs = await client.cache.guild.getData(interaction.guild.id);
+		if (!rs) return;
+
+		console.log(rs.guild_id);
 	}
 }

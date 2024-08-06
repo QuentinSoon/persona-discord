@@ -1,6 +1,6 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder as DiscordSlashCommandBuilder } from 'discord.js';
 
-export default class CommandBuilder extends SlashCommandBuilder {
+export class SlashCommandBuilder extends DiscordSlashCommandBuilder {
 	private _modules: string | undefined = undefined;
 
 	constructor() {

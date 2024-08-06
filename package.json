@@ -4,7 +4,8 @@
 	"description": "",
 	"main": "src/index.ts",
 	"scripts": {
-		"dev": "tsx watch src/index.ts"
+		"dev": "tsx watch src/index.ts",
+		"shard": "node --trace-warnings src/shard.ts "
 	},
 	"keywords": [],
 	"author": "QuentinSoon",
@@ -14,7 +15,9 @@
 		"axios": "^1.7.2",
 		"discord.js": "^14.15.3",
 		"dotenv": "^16.4.5",
+		"fs": "0.0.1-security",
 		"ioredis": "^5.4.1",
+		"path": "^0.12.7",
 		"tsx": "^4.16.2",
 		"typescript": "^5.5.4",
 		"zod": "^3.23.8"

@@ -1,5 +1,5 @@
 import path from 'path';
-import EventStructure from '../../structure/EventStructure';
+import EventComponent from '../../components/events/events';
 import { loadFiles } from '../../utils/files';
 import DiscordClient from '../DiscordClient';
 
@@ -25,8 +25,7 @@ export default class EventsHandler {
 					continue;
 				}
 				const event = new Event();
-				if (event instanceof EventStructure) {
-					// this.client.events.set(event.name, event);
+				if (event instanceof EventComponent) {
 					if (event.once) {
 						this.client.once(
 							event.name,

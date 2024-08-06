@@ -1,10 +1,8 @@
-import axios from 'axios';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
-	Channel,
 	ChannelSelectMenuBuilder,
 	ChannelSelectMenuInteraction,
 	ChannelType,
@@ -12,115 +10,141 @@ import {
 	ModalActionRowComponentBuilder,
 	ModalBuilder,
 	ModalSubmitInteraction,
-	NewsChannel,
+	TextChannel,
 	TextInputBuilder,
 	TextInputStyle,
 } from 'discord.js';
-import 'dotenv/config';
 import DiscordClient from '../../client/DiscordClient';
-import {
-	AlertsSchema,
-	AlertsType,
-	AlertType,
-} from '../../interface/Alert.interface';
-import ModuleStructure from '../../structure/ModuleStructure';
-import { getData, setData, updateData } from '../../utils/data';
+import ModuleComponent from '../../components/modules/modules';
+import { supabase } from '../../utils/supabase';
 
-export default class AlertModule extends ModuleStructure {
+export default class AlertModule extends ModuleComponent {
+	protected timeToCache: number = 1;
+
 	constructor(client: DiscordClient) {
 		super(client, 'alert');
 
-		setInterval(async () => {
-			// const result = await client.redis.get('alerts');
-			const result = await getData(client, 'alerts');
-			if (!result) return console.log('No alert found');
-			const data: AlertsType = AlertsSchema.parse(result);
-			if (!data) return console.log('No alert found');
-			data.map(async (alert) => {
-				if (alert.type === 'twitch') {
-					if (!alert.channel_id) return;
-					checkIfLive(alert.name, alert.channel_id, alert);
-				}
-			});
-		}, Number(process.env.INTERVAL_ALERT ?? 60) * 1000);
+		async function checkStreamers() {
+			// Récupère tous les streamers de la base de données
+			const streamerData = await client.cache.alert.getData();
 
-		async function checkIfLive(
-			username: string,
-			channelSender: string,
-			alert: AlertType
-		) {
-			try {
-				const response = await axios.get(
-					`https://api.twitch.tv/helix/streams?user_login=${username}`,
-					{
-						headers: {
-							Authorization: `Bearer ${process.env.TWITCH_ACCESS_TOKEN}`,
-							'Client-Id': process.env.TWITCH_CLIENT_ID,
-						},
-					}
+			if (!streamerData) return;
+
+			const streamerNames = streamerData.map((row) => row.login_id);
+
+			await updateLiveStreamers(streamerNames);
+
+			// Obtenir les streamers en ligne depuis Redis
+			const liveStreamers = await client.redis.hkeys('currentLiveStreamers');
+
+			for (const streamer of liveStreamers) {
+				const notified = await client.redis.sismember(
+					'notifiedStreamers',
+					streamer
 				);
-				if (response.data.data.length === 0) {
-					console.log(`${username} is not live`);
-					return;
+
+				if (!notified) {
+					await client.redis.sadd('notifiedStreamers', streamer);
+					const streamDataRaw = await client.redis.hget(
+						'currentLiveStreamers',
+						streamer
+					);
+					if (!streamDataRaw) return;
+					const streamData = JSON.parse(streamDataRaw);
+
+					// Envoyer une notification pour chaque guilde concernée
+					for (const data of streamerData.filter(
+						(row) => row.login_id === streamer
+					)) {
+						const channel = client.channels.cache.get(
+							data.channel_id ?? ''
+						) as TextChannel;
+						if (channel) {
+							console.log(streamData);
+							const thumbnail_url = streamData.thumbnail_url
+								.replace('{width}', '1280')
+								.replace('{height}', '720');
+							const pic = await client.twitch.getProfilePicture(
+								streamData.user_id
+							);
+							channel.send({
+								content: '',
+								embeds: [
+									new EmbedBuilder()
+										.setTitle(streamData.title)
+										.setAuthor({
+											iconURL: pic,
+											name: `${streamData.user_name} est en live sur Twitch !`,
+										})
+										.setURL(`https://twitch.tv/${streamData.user_name}`)
+										.setDescription(data.description ?? '')
+										.setImage(thumbnail_url)
+										.addFields(
+											{
+												name: 'Jeu',
+												value: streamData.game_name ?? 'Aucun jeu',
+												inline: true,
+											},
+											{
+												name: 'Viewers',
+												value: streamData.viewer_count + '' ?? '0',
+												inline: true,
+											}
+										)
+										.setFooter({
+											text: 'Persona.app - Discord Bot',
+											iconURL: client.user!.avatarURL() as string,
+										})
+										.setColor('#f8e5fe'),
+								],
+								components: [
+									new ActionRowBuilder<ButtonBuilder>().addComponents(
+										new ButtonBuilder()
+											.setLabel('Voir sur Twitch')
+											.setStyle(ButtonStyle.Link)
+											.setURL(`https://twitch.tv/${streamData.user_name}`)
+									),
+								],
+							});
+						}
+					}
 				}
-				const data = await response.data.data[0];
-				console.log('Response:', data);
+			}
 
-				const channel = (await client.channels.cache.find(
-					(channel) => channel.id === channelSender
-				)) as Channel;
-				if (!channel) return;
-				const chan: NewsChannel = channel as NewsChannel;
-
-				const thumbnail_url = data.thumbnail_url
-					.replace('{width}', '1280')
-					.replace('{height}', '720');
-				console.log(thumbnail_url);
-				console.log(data.game_name);
-				console.log(data.viewer_count);
-				await chan.send({
-					content: alert.description ?? 'Aucune description',
-					embeds: [
-						new EmbedBuilder()
-							.setTitle(data.title)
-							.setURL(`https://twitch.tv/${username}`)
-							.setImage(thumbnail_url)
-							.addFields(
-								{
-									name: 'Jeu',
-									value: data.game_name ?? 'Aucun jeu',
-									inline: true,
-								},
-								{
-									name: 'Viewers',
-									value: data.viewer_count + '' ?? '0',
-									inline: true,
-								}
-							)
-
-							.setFooter({
-								text: 'Persona.app - Discord Bot',
-								iconURL: client.user!.avatarURL() as string,
-							})
-							.setColor('#f8e5fe'),
-					],
-					components: [
-						new ActionRowBuilder<ButtonBuilder>().addComponents(
-							new ButtonBuilder()
-								.setLabel('Voir sur Twitch')
-								.setStyle(ButtonStyle.Link)
-								.setURL(`https://twitch.tv/${username}`)
-						),
-					],
-				});
-			} catch (error) {
-				console.log('Error occurred:', error);
+			// Retirer les streamers qui ne sont plus en ligne de Redis
+			const notifiedStreamers = await client.redis.smembers(
+				'notifiedStreamers'
+			);
+			for (const streamer of notifiedStreamers) {
+				if (!liveStreamers.includes(streamer)) {
+					await client.redis.srem('notifiedStreamers', streamer);
+				}
 			}
 		}
+
+		async function updateLiveStreamers(streamerNames) {
+			await client.redis.del('currentLiveStreamers');
+
+			for (let i = 0; i < streamerNames.length; i += 100) {
+				const streamersBatch = streamerNames.slice(i, i + 100);
+				const response = await client.twitch.getStreamsById(streamersBatch);
+
+				for (const stream of response) {
+					await client.redis.hset(
+						'currentLiveStreamers',
+						stream.user_id,
+						JSON.stringify(stream)
+					);
+				}
+			}
+		}
+
+		setInterval(checkStreamers, this.timeToCache * 60 * 1000);
 	}
 
-	start = async (client: DiscordClient, interaction: ButtonInteraction) => {
+	async setup(client: DiscordClient, interaction: ButtonInteraction) {
 		await interaction.update({
+			content: '',
 			embeds: [
 				new EmbedBuilder()
 					.setTitle("Configurer le module d'alerte")
@@ -145,19 +169,23 @@ export default class AlertModule extends ModuleStructure {
 						.setStyle(ButtonStyle.Secondary)
 						.setCustomId('panel:showModules'),
 					new ButtonBuilder()
-						.setLabel('Commencer la Configuration')
+						.setLabel('Liste des alertes')
+						.setStyle(ButtonStyle.Primary)
+						.setCustomId('alert:listAlert'),
+					new ButtonBuilder()
+						.setLabel('Configurer une alerte')
 						.setStyle(ButtonStyle.Success)
 						.setCustomId('alert:showModal')
 				),
 			],
 		});
-	};
+	}
 
 	showModal = async (client: DiscordClient, interaction: ButtonInteraction) => {
 		await interaction.showModal(
 			new ModalBuilder()
 				.setTitle('Ajouter une nouvelle alerte')
-				.setCustomId('alert:selectTextChannel')
+				.setCustomId('alert:confirmUser')
 				.addComponents(
 					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
 						new TextInputBuilder()
@@ -171,7 +199,7 @@ export default class AlertModule extends ModuleStructure {
 						new TextInputBuilder()
 							.setLabel('Description du template')
 							.setCustomId('alert-modal-description')
-							.setPlaceholder('PersonaApp est en stream! 🚀')
+							.setPlaceholder('PersonaApp est en stream! 🚀 @everyone')
 							.setStyle(TextInputStyle.Paragraph)
 							.setRequired(false)
 					)
@@ -179,41 +207,82 @@ export default class AlertModule extends ModuleStructure {
 		);
 	};
 
-	selectTextChannel = async (
+	confirmUser = async (
 		client: DiscordClient,
 		interaction: ButtonInteraction
 	) => {
-		const id = interaction.guildId;
+		if (!interaction.guild) return;
+		const guildId = interaction.guild.id;
+		let streamerName: any;
+		let streamerNameField = '';
+		let streamerDescription = '';
 
 		if (interaction.isModalSubmit()) {
 			const field: ModalSubmitInteraction = interaction;
-			const twitchUsername =
-				field.fields.getTextInputValue('alert-modal-title');
-			const twitchDescription = field.fields.getTextInputValue(
+			streamerNameField = field.fields.getTextInputValue('alert-modal-title');
+			streamerDescription = field.fields.getTextInputValue(
 				'alert-modal-description'
 			);
-
-			if (!twitchUsername || !twitchDescription) return;
-
-			try {
-				const result: AlertsType = await getData(client, 'alerts');
-				if (!result) return;
-				const alert = result.find((alert) => alert.name === twitchUsername);
-				if (alert) return console.log('Alert already exists');
-				await setData(client, 'alerts', [
-					...result,
-					{
-						guild_id: id,
-						name: twitchUsername,
-						description: twitchDescription,
-						type: 'twitch',
-					},
-				]);
-			} catch (error) {
-				console.log('Error occurred:', error);
-			}
+			streamerName = await client.twitch.getUser(streamerNameField);
+			streamerNameField = streamerName.id;
 		}
 
+		await interaction.update({
+			embeds: [
+				new EmbedBuilder()
+					.setTitle("Configurer le module d'alerte")
+					.setDescription(`La personne est elle bien ce streamer ?`)
+					.setFields(
+						{
+							name: 'Nom',
+							value: streamerName.display_name,
+							inline: true,
+						},
+						{
+							name: 'ID',
+							value: streamerName.id,
+							inline: true,
+						},
+						{
+							name: 'Description',
+							value: streamerName.description,
+							inline: false,
+						}
+					)
+					.setThumbnail(streamerName.profile_image_url)
+					.setFooter({
+						text: 'Persona.app - Discord Bot',
+						iconURL: client.user!.avatarURL() as string,
+					})
+					.setColor('#f8e5fe'),
+			],
+			components: [
+				new ActionRowBuilder<ButtonBuilder>().addComponents(
+					new ButtonBuilder()
+						.setLabel('Annuler')
+						.setStyle(ButtonStyle.Secondary)
+						.setCustomId('alert:setup'),
+					new ButtonBuilder()
+						.setLabel('Non')
+						.setStyle(ButtonStyle.Danger)
+						.setCustomId('alert:showModal'),
+					new ButtonBuilder()
+						.setLabel('Oui')
+						.setStyle(ButtonStyle.Success)
+						.setCustomId(
+							`alert:addChannel:${streamerNameField}:${streamerDescription}`
+						)
+				),
+			],
+		});
+	};
+
+	addChannel = async (
+		client: DiscordClient,
+		interaction: ButtonInteraction,
+		streamerNameField: string,
+		streamerDescription: string
+	) => {
 		await interaction.update({
 			embeds: [
 				new EmbedBuilder()
@@ -229,7 +298,9 @@ export default class AlertModule extends ModuleStructure {
 			components: [
 				new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
 					new ChannelSelectMenuBuilder()
-						.setCustomId('alert:confirmAlert')
+						.setCustomId(
+							`alert:comfirmAlert:${streamerNameField}:${streamerDescription}`
+						)
 						.setPlaceholder('Selectionnez un salon textuel')
 						.setChannelTypes(
 							ChannelType.GuildAnnouncement | ChannelType.GuildText
@@ -240,30 +311,45 @@ export default class AlertModule extends ModuleStructure {
 					new ButtonBuilder()
 						.setLabel('Retour')
 						.setStyle(ButtonStyle.Secondary)
-						.setCustomId('alert:start')
+						.setCustomId('alert:confirmUser')
 				),
 			],
 		});
 	};
 
-	confirmAlert = async (
+	comfirmAlert = async (
 		client: DiscordClient,
-		interaction: ChannelSelectMenuInteraction
+		interaction: ChannelSelectMenuInteraction,
+		streamerNameField: string,
+		streamerDescription: string
 	) => {
-		const id = interaction.guildId;
-		if (!id) return;
-		const channel = interaction.values[0];
-		console.log(channel);
+		const loginId = streamerNameField;
+		const channelId = interaction.values[0];
 
-		await updateData(
-			client,
-			'alerts',
-			[
-				{
-					channel_id: channel,
-				},
+		console.log(loginId + ':' + channelId);
+		const { data, error } = await supabase.from('alerts').insert({
+			guild_id: interaction.guild?.id,
+			login_id: loginId,
+			channel_id: channelId,
+			description: streamerDescription,
+			type: 'twitch',
+		});
+
+		if (error) return console.log(error);
+
+		await interaction.update({
+			embeds: [
+				new EmbedBuilder()
+					.setTitle("Configurer le module d'alerte")
+					.setDescription('La configuration des alertes est terminée. 🎉')
+					.setThumbnail(client.user!.avatarURL())
+					.setFooter({
+						text: 'Persona.app - Discord Bot',
+						iconURL: client.user!.avatarURL() as string,
+					})
+					.setColor('#f8e5fe'),
 			],
-			id
-		);
+			components: [],
+		});
 	};
 }

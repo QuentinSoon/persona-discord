@@ -1,7 +1,7 @@
 import { REST, Routes } from 'discord.js';
 import path from 'path';
 import DiscordClient from '../../client/DiscordClient';
-import CommandStructure from '../../structure/CommandStructure';
+import { SlashCommandComponent } from '../../components/commands/commands';
 import { loadFiles } from '../../utils/files';
 
 const rest = new REST().setToken(process.env.BOT_TOKEN as string);
@@ -29,7 +29,7 @@ export default class CommandsHandler {
 					continue;
 				}
 				const command = new Command();
-				if (command instanceof CommandStructure) {
+				if (command instanceof SlashCommandComponent) {
 					this.client.collection.application_commands.set(
 						command.data.name,
 						command

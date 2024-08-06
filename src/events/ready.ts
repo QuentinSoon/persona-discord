@@ -1,15 +1,14 @@
 import { Events } from 'discord.js';
 import DiscordClient from '../client/DiscordClient';
-import EventStructure from '../structure/EventStructure';
+import EventComponent from '../components/events/events';
 
-export default class ReadyEvent extends EventStructure {
+export default class ReadyEvent extends EventComponent {
 	constructor() {
 		super(Events.ClientReady, true);
 	}
 
 	async execute(client: DiscordClient) {
 		if (!client.user) return;
-
 		console.log(`Logged in as ${client.user.tag}!`);
 	}
 }

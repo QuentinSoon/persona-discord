@@ -1,7 +1,7 @@
 import { Events } from 'discord.js';
-import DiscordClient from '../client/DiscordClient';
+import DiscordClient from '../../client/DiscordClient';
 
-export default abstract class EventStructure {
+export default abstract class EventComponent {
 	private _name: Events;
 	private _once: boolean = false;
 
