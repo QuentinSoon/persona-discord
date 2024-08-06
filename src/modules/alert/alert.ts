@@ -19,7 +19,7 @@ import ModuleComponent from '../../components/modules/modules';
 import { supabase } from '../../utils/supabase';
 
 export default class AlertModule extends ModuleComponent {
-	protected timeToCache: number = 1;
+	protected timeToCache: number = 0.05;
 
 	constructor(client: DiscordClient) {
 		super(client, 'alert');
@@ -77,7 +77,6 @@ export default class AlertModule extends ModuleComponent {
 											name: `${streamData.user_name} est en live sur Twitch !`,
 										})
 										.setURL(`https://twitch.tv/${streamData.user_name}`)
-										.setDescription(data.description ?? '')
 										.setImage(thumbnail_url)
 										.addFields(
 											{
@@ -334,6 +333,8 @@ export default class AlertModule extends ModuleComponent {
 			description: streamerDescription,
 			type: 'twitch',
 		});
+		// add alert to redis
+		await client.redis.sadd('notifiedStreamers', loginId);
 
 		if (error) return console.log(error);
 
