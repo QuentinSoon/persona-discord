@@ -333,7 +333,7 @@ export default class AlertModule extends ModuleComponent {
 			description: streamerDescription,
 			type: 'twitch',
 		});
-		// add alert to redis
+		// add alert to redis (notifiedStreamers)
 		await client.redis.sadd('notifiedStreamers', loginId);
 
 		if (error) return console.log(error);
