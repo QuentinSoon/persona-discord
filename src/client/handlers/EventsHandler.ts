@@ -1,7 +1,11 @@
-import path from 'path';
 import EventComponent from '../../components/events/events';
 import { loadFiles } from '../../utils/files';
 import DiscordClient from '../DiscordClient';
+
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default class EventsHandler {
 	client: DiscordClient;

@@ -1,10 +1,14 @@
 import { REST, Routes } from 'discord.js';
-import path from 'path';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 import DiscordClient from '../../client/DiscordClient';
 import { SlashCommandComponent } from '../../components/commands/commands';
 import { loadFiles } from '../../utils/files';
 
 const rest = new REST().setToken(process.env.BOT_TOKEN as string);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default class CommandsHandler {
 	client: DiscordClient;

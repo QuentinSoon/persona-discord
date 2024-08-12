@@ -7,9 +7,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import path from 'path';
 import EventComponent from '../../components/events/events';
 import { loadFiles } from '../../utils/files';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 export default class EventsHandler {
     constructor(client) {
         this.client = client;
