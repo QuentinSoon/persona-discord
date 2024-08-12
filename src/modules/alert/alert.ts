@@ -21,7 +21,7 @@ import { redis } from '../../utils/redis';
 import { supabase } from '../../utils/supabase';
 
 export default class AlertModule extends ModuleComponent {
-	protected timeToCache: number = 3;
+	protected timeToCache: number = 30;
 
 	constructor(client: DiscordClient) {
 		super(client, 'alert');

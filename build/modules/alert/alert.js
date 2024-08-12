@@ -14,7 +14,7 @@ import { supabase } from '../../utils/supabase.js';
 export default class AlertModule extends ModuleComponent {
     constructor(client) {
         super(client, 'alert');
-        this.timeToCache = 3;
+        this.timeToCache = 30;
         this.showModal = (client, interaction) => __awaiter(this, void 0, void 0, function* () {
             yield interaction.showModal(new ModalBuilder()
                 .setTitle('Ajouter une nouvelle alerte')
