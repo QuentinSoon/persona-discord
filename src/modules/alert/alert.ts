@@ -210,7 +210,12 @@ export default class AlertModule extends ModuleComponent {
 			streamerData = await client.twitch.getUser(streamerNameField);
 		}
 
-		if (!streamerData) return;
+		if (!streamerData)
+			return interaction.update({
+				content: 'Streamer introuvable.',
+				embeds: [],
+				components: [],
+			});
 
 		await interaction.update({
 			embeds: [
