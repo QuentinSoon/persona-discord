@@ -5,7 +5,9 @@
 	"main": "src/index.ts",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
-		"shard": "node --trace-warnings src/shard.ts "
+		"run": "node --trace-warnings src/index.ts",
+		"shard": "node --trace-warnings src/shard.ts",
+		"build": "tsc --build"
 	},
 	"keywords": [],
 	"author": "QuentinSoon",
