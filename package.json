@@ -1,13 +1,11 @@
 {
 	"name": "persona-discord",
 	"version": "1.0.0",
-	"type": "module",
 	"description": "Advanced automatic and manual moderation bot designed for small, medium and large communities.",
 	"main": "src/index.ts",
 	"scripts": {
-		"dev": "NODE_ENV=development tsx watch src/index.ts",
-		"start": "NODE_ENV=production node build/index.js",
-		"build": "tsc && node fix-imports.cjs"
+		"dev": "tsx watch src/index.ts",
+		"start": "ts-node src/index.ts"
 	},
 	"keywords": [],
 	"author": "QuentinSpace",
@@ -18,7 +16,9 @@
 		"discord.js": "^14.15.3",
 		"dotenv": "^16.4.5",
 		"ioredis": "^5.4.1",
+		"ts-node": "^10.9.2",
 		"tsx": "^4.17.0",
+		"typescript": "^5.5.4",
 		"zod": "^3.23.8"
 	}
 }
