@@ -16,11 +16,14 @@ export default class EventsHandler {
 
 	async load() {
 		try {
-			const files = await loadFiles('./src/events/');
+			const basePath =
+				process.env.NODE_ENV === 'production'
+					? './build/' // Chemin pour le dossier build
+					: './src/'; // Chemin pour le dossier src
+			// const files = await loadFiles('./src/events/');
+			const files = await loadFiles(basePath + '/events/');
 			for (const file of files) {
-				const { default: Event } = await import(
-					path.join(__dirname, '../../../', file)
-				);
+				const { default: Event } = await import(path.join('../../../', file));
 				console.log(`Imported Event from file ${file}:`, Event);
 				if (typeof Event !== 'function') {
 					console.error(

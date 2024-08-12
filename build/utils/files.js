@@ -12,14 +12,16 @@ import path from 'path';
 export const loadFiles = (dir) => __awaiter(void 0, void 0, void 0, function* () {
     const getTsFiles = (dir, fileList = []) => __awaiter(void 0, void 0, void 0, function* () {
         const files = yield fs.promises.readdir(dir);
+        console.log(files);
         for (const file of files) {
             const filePath = path.join(dir, file);
             const stat = yield fs.promises.stat(filePath);
             if (stat.isDirectory()) {
                 yield getTsFiles(filePath, fileList);
             }
-            else if (file.endsWith('.ts' || file.endsWith('.js'))) {
+            else if (file.endsWith('.ts') || file.endsWith('.js')) {
                 fileList.push(filePath);
+                console.log(filePath);
             }
         }
         return fileList;

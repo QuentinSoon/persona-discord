@@ -22,9 +22,12 @@ export default class CommandsHandler {
     load() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const files = yield loadFiles('./src/commands/');
+                const basePath = process.env.NODE_ENV === 'production'
+                    ? './build' // Chemin pour le dossier build
+                    : './src'; // Chemin pour le dossier src
+                const files = yield loadFiles(basePath + '/commands/'); // TODO: change path
                 for (const file of files) {
-                    const { default: Command } = yield import(path.join(__dirname, '../../../', file));
+                    const { default: Command } = yield import(path.join('../../../', file));
                     console.log(`Imported Command from file ${file}:`, Command);
                     if (typeof Event !== 'function') {
                         console.error(`Failed to load command from file ${file}: Not a constructor`);

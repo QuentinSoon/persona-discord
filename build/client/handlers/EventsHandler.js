@@ -20,9 +20,13 @@ export default class EventsHandler {
     load() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const files = yield loadFiles('./src/events/');
+                const basePath = process.env.NODE_ENV === 'production'
+                    ? './build/' // Chemin pour le dossier build
+                    : './src/'; // Chemin pour le dossier src
+                // const files = await loadFiles('./src/events/');
+                const files = yield loadFiles(basePath + '/events/');
                 for (const file of files) {
-                    const { default: Event } = yield import(path.join(__dirname, '../../../', file));
+                    const { default: Event } = yield import(path.join('../../../', file));
                     console.log(`Imported Event from file ${file}:`, Event);
                     if (typeof Event !== 'function') {
                         console.error(`Failed to load event from file ${file}: Not a constructor`);

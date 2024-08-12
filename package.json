@@ -5,8 +5,8 @@
 	"description": "Advanced automatic and manual moderation bot designed for small, medium and large communities.",
 	"main": "src/index.ts",
 	"scripts": {
-		"dev": "tsx watch src/index.ts",
-		"start": "node build/index.js",
+		"dev": "NODE_ENV=development tsx watch src/index.ts",
+		"start": "NODE_ENV=production node build/index.js",
 		"build": "tsc && node fix-imports.cjs"
 	},
 	"keywords": [],

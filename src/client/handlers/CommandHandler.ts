@@ -19,11 +19,14 @@ export default class CommandsHandler {
 
 	async load() {
 		try {
-			const files = await loadFiles('./src/commands/');
+			const basePath =
+				process.env.NODE_ENV === 'production'
+					? './build' // Chemin pour le dossier build
+					: './src'; // Chemin pour le dossier src
+
+			const files = await loadFiles(basePath + '/commands/'); // TODO: change path
 			for (const file of files) {
-				const { default: Command } = await import(
-					path.join(__dirname, '../../../', file)
-				);
+				const { default: Command } = await import(path.join('../../../', file));
 				console.log(`Imported Command from file ${file}:`, Command);
 				if (typeof Event !== 'function') {
 					console.error(
