@@ -14,7 +14,7 @@ export const loadFiles = async (dir: string): Promise<string[]> => {
 
 			if (stat.isDirectory()) {
 				await getTsFiles(filePath, fileList);
-			} else if (file.endsWith('.ts')) {
+			} else if (file.endsWith('.ts' || file.endsWith('.js'))) {
 				fileList.push(filePath);
 			}
 		}

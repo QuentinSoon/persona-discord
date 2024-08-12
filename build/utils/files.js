@@ -18,7 +18,7 @@ export const loadFiles = (dir) => __awaiter(void 0, void 0, void 0, function* ()
             if (stat.isDirectory()) {
                 yield getTsFiles(filePath, fileList);
             }
-            else if (file.endsWith('.ts')) {
+            else if (file.endsWith('.ts' || file.endsWith('.js'))) {
                 fileList.push(filePath);
             }
         }
