@@ -11,14 +11,10 @@
 	"author": "QuentinSpace",
 	"license": "MIT",
 	"dependencies": {
-		"@supabase/supabase-js": "^2.45.1",
-		"axios": "^1.7.3",
 		"discord.js": "^14.15.3",
 		"dotenv": "^16.4.5",
-		"ioredis": "^5.4.1",
 		"ts-node": "^10.9.2",
 		"tsx": "^4.17.0",
-		"typescript": "^5.5.4",
-		"zod": "^3.23.8"
+		"typescript": "^5.5.4"
 	}
 }
