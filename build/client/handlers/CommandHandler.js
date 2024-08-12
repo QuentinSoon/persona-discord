@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { REST, Routes } from 'discord.js';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { SlashCommandComponent } from '../../components/commands/commands';
-import { loadFiles } from '../../utils/files';
+import { SlashCommandComponent } from '../../components/commands/commands.js';
+import { loadFiles } from '../../utils/files.js';
 const rest = new REST().setToken(process.env.BOT_TOKEN);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

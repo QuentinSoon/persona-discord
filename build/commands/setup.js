@@ -1,5 +1,5 @@
-import { SlashCommandBuilder } from '../builders/commands';
-import { SlashCommandComponent } from '../components/commands/commands';
+import { SlashCommandBuilder } from '../builders/commands.js';
+import { SlashCommandComponent } from '../components/commands/commands.js';
 export default class PingCommand extends SlashCommandComponent {
     constructor() {
         super(new SlashCommandBuilder()

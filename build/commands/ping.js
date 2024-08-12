@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { SlashCommandBuilder } from '../builders/commands';
-import { SlashCommandComponent } from '../components/commands/commands';
+import { SlashCommandBuilder } from '../builders/commands.js';
+import { SlashCommandComponent } from '../components/commands/commands.js';
 export default class PingCommand extends SlashCommandComponent {
     constructor() {
         super(new SlashCommandBuilder().setName('ping').setDescription('Ping pong'));

@@ -8,9 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, } from 'discord.js';
-import ModuleComponent from '../../components/modules/modules';
-import { redis } from '../../utils/redis';
-import { supabase } from '../../utils/supabase';
+import ModuleComponent from '../../components/modules/modules.js';
+import { redis } from '../../utils/redis.js';
+import { supabase } from '../../utils/supabase.js';
 export default class AlertModule extends ModuleComponent {
     constructor(client) {
         super(client, 'alert');

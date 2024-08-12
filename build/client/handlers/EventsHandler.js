@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import EventComponent from '../../components/events/events';
-import { loadFiles } from '../../utils/files';
+import EventComponent from '../../components/events/events.js';
+import { loadFiles } from '../../utils/files.js';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);

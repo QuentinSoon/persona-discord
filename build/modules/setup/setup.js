@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, } from 'discord.js';
-import ModuleComponent from '../../components/modules/modules';
+import ModuleComponent from '../../components/modules/modules.js';
 export default class SetupModule extends ModuleComponent {
     constructor(client) {
         super(client, 'setup');

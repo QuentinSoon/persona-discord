@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Events } from 'discord.js';
-import EventComponent from '../components/events/events';
+import EventComponent from '../components/events/events.js';
 export default class ReadyEvent extends EventComponent {
     constructor() {
         super(Events.ClientReady, true);

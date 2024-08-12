@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { ActivityType, Client, Collection, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
-import TwitchAPI from '../api/TwitchAPI';
-import AlertModule from '../modules/alert/alert';
-import SetupModule from '../modules/setup/setup';
-import Cache from './cache';
-import CommandsHandler from './handlers/CommandHandler';
-import EventsHandler from './handlers/EventsHandler';
+import TwitchAPI from '../api/TwitchAPI.js';
+import AlertModule from '../modules/alert/alert.js';
+import SetupModule from '../modules/setup/setup.js';
+import Cache from './cache.js';
+import CommandsHandler from './handlers/CommandHandler.js';
+import EventsHandler from './handlers/EventsHandler.js';
 export default class DiscordClient extends Client {
     constructor() {
         super({

@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import AlertClass from '../classes/alert/Alert.class';
-import GuildClass from '../classes/guild/Guild.class';
+import AlertClass from '../classes/alert/Alert.class.js';
+import GuildClass from '../classes/guild/Guild.class.js';
 export default class Cache {
     constructor(client) {
         this.client = client;

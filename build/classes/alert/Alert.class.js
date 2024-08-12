@@ -8,9 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import 'dotenv/config';
-import { redis } from '../../utils/redis';
-import { supabase } from '../../utils/supabase';
-import { AlertsSchema } from './types';
+import { redis } from '../../utils/redis.js';
+import { supabase } from '../../utils/supabase.js';
+import { AlertsSchema } from './types.js';
 export default class AlertClass {
     constructor(client) {
         this.timeToCache = 24;
