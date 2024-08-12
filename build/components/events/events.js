@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-class EventComponent {
+export default class EventComponent {
     constructor(name, once = false) {
         this._once = false;
         this._name = name;
@@ -13,4 +11,3 @@ class EventComponent {
         return this._once;
     }
 }
-exports.default = EventComponent;

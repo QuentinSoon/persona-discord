@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SlashCommandBuilder = void 0;
-const discord_js_1 = require("discord.js");
-class SlashCommandBuilder extends discord_js_1.SlashCommandBuilder {
+import { SlashCommandBuilder as DiscordSlashCommandBuilder } from 'discord.js';
+export class SlashCommandBuilder extends DiscordSlashCommandBuilder {
     constructor() {
         super();
         this._modules = undefined;
@@ -18,4 +15,3 @@ class SlashCommandBuilder extends discord_js_1.SlashCommandBuilder {
         return this._modules;
     }
 }
-exports.SlashCommandBuilder = SlashCommandBuilder;

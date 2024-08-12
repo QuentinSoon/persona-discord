@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,12 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const commands_1 = require("../builders/commands");
-const commands_2 = require("../components/commands/commands");
-class PingCommand extends commands_2.SlashCommandComponent {
+import { SlashCommandBuilder } from '../builders/commands';
+import { SlashCommandComponent } from '../components/commands/commands';
+export default class PingCommand extends SlashCommandComponent {
     constructor() {
-        super(new commands_1.SlashCommandBuilder().setName('ping').setDescription('Ping pong'));
+        super(new SlashCommandBuilder().setName('ping').setDescription('Ping pong'));
     }
     execute(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -28,4 +26,3 @@ class PingCommand extends commands_2.SlashCommandComponent {
         });
     }
 }
-exports.default = PingCommand;

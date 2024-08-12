@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,47 +7,43 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const discord_js_1 = require("discord.js");
-require("dotenv/config");
-const TwitchAPI_1 = __importDefault(require("../api/TwitchAPI"));
-const alert_1 = __importDefault(require("../modules/alert/alert"));
-const setup_1 = __importDefault(require("../modules/setup/setup"));
-const cache_1 = __importDefault(require("./cache"));
-const CommandHandler_1 = __importDefault(require("./handlers/CommandHandler"));
-const EventsHandler_1 = __importDefault(require("./handlers/EventsHandler"));
-class DiscordClient extends discord_js_1.Client {
+import { ActivityType, Client, Collection, IntentsBitField } from 'discord.js';
+import 'dotenv/config';
+import TwitchAPI from '../api/TwitchAPI';
+import AlertModule from '../modules/alert/alert';
+import SetupModule from '../modules/setup/setup';
+import Cache from './cache';
+import CommandsHandler from './handlers/CommandHandler';
+import EventsHandler from './handlers/EventsHandler';
+export default class DiscordClient extends Client {
     constructor() {
         super({
             intents: [
-                discord_js_1.IntentsBitField.Flags.Guilds,
-                discord_js_1.IntentsBitField.Flags.GuildMessages,
-                discord_js_1.IntentsBitField.Flags.GuildMembers,
-                discord_js_1.IntentsBitField.Flags.MessageContent,
+                IntentsBitField.Flags.Guilds,
+                IntentsBitField.Flags.GuildMessages,
+                IntentsBitField.Flags.GuildMembers,
+                IntentsBitField.Flags.MessageContent,
             ],
             presence: {
                 activities: [
                     {
                         name: "Persona.app - Lify's Shard",
-                        type: discord_js_1.ActivityType.Custom,
+                        type: ActivityType.Custom,
                     },
                 ],
                 status: 'online',
             },
         });
         this.collection = {
-            application_commands: new discord_js_1.Collection(),
+            application_commands: new Collection(),
         };
         this.rest_application_commands_array = [];
-        this.commands_handler = new CommandHandler_1.default(this);
-        this.events_handler = new EventsHandler_1.default(this);
-        this.cache = new cache_1.default(this);
-        this.setup = new setup_1.default(this);
-        this.alert = new alert_1.default(this);
-        this.twitch = new TwitchAPI_1.default();
+        this.commands_handler = new CommandsHandler(this);
+        this.events_handler = new EventsHandler(this);
+        this.cache = new Cache(this);
+        this.setup = new SetupModule(this);
+        this.alert = new AlertModule(this);
+        this.twitch = new TwitchAPI();
         this.connect = () => __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log(`Attempting to connect to the Discord bot...`);
@@ -63,4 +58,3 @@ class DiscordClient extends discord_js_1.Client {
         });
     }
 }
-exports.default = DiscordClient;

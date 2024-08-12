@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,32 +7,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const discord_js_1 = require("discord.js");
-const modules_1 = __importDefault(require("../../components/modules/modules"));
-const redis_1 = require("../../utils/redis");
-const supabase_1 = require("../../utils/supabase");
-class AlertModule extends modules_1.default {
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, } from 'discord.js';
+import ModuleComponent from '../../components/modules/modules';
+import { redis } from '../../utils/redis';
+import { supabase } from '../../utils/supabase';
+export default class AlertModule extends ModuleComponent {
     constructor(client) {
         super(client, 'alert');
         this.timeToCache = 3;
         this.showModal = (client, interaction) => __awaiter(this, void 0, void 0, function* () {
-            yield interaction.showModal(new discord_js_1.ModalBuilder()
+            yield interaction.showModal(new ModalBuilder()
                 .setTitle('Ajouter une nouvelle alerte')
                 .setCustomId('alert:confirmUser')
-                .addComponents(new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder()
+                .addComponents(new ActionRowBuilder().addComponents(new TextInputBuilder()
                 .setLabel('Nom du streamer')
                 .setCustomId('alert-modal-title')
                 .setPlaceholder('PersonaApp')
-                .setStyle(discord_js_1.TextInputStyle.Short)
-                .setRequired(true)), new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder()
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)), new ActionRowBuilder().addComponents(new TextInputBuilder()
                 .setLabel("Description dans l'alerte (Facultatif)")
                 .setCustomId('alert-modal-description')
                 .setPlaceholder('PersonaApp est en stream! 🚀 @everyone')
-                .setStyle(discord_js_1.TextInputStyle.Paragraph)
+                .setStyle(TextInputStyle.Paragraph)
                 .setRequired(false))));
         });
         this.confirmUser = (client, interaction) => __awaiter(this, void 0, void 0, function* () {
@@ -53,7 +48,7 @@ class AlertModule extends modules_1.default {
                 return;
             yield interaction.update({
                 embeds: [
-                    new discord_js_1.EmbedBuilder()
+                    new EmbedBuilder()
                         .setTitle("Configurer le module d'alerte")
                         .setDescription(`Est-ce que la personne est bien ce streamer ?`)
                         .setFields({
@@ -77,15 +72,15 @@ class AlertModule extends modules_1.default {
                         .setColor('#f8e5fe'),
                 ],
                 components: [
-                    new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder()
+                    new ActionRowBuilder().addComponents(new ButtonBuilder()
                         .setLabel('Annuler')
-                        .setStyle(discord_js_1.ButtonStyle.Secondary)
-                        .setCustomId('alert:setup'), new discord_js_1.ButtonBuilder()
+                        .setStyle(ButtonStyle.Secondary)
+                        .setCustomId('alert:setup'), new ButtonBuilder()
                         .setLabel('Non')
-                        .setStyle(discord_js_1.ButtonStyle.Danger)
-                        .setCustomId('alert:showModal'), new discord_js_1.ButtonBuilder()
+                        .setStyle(ButtonStyle.Danger)
+                        .setCustomId('alert:showModal'), new ButtonBuilder()
                         .setLabel('Oui')
-                        .setStyle(discord_js_1.ButtonStyle.Success)
+                        .setStyle(ButtonStyle.Success)
                         .setCustomId(`alert:addChannel:${streamerNameField}:${streamerDescription}:${streamerData.id}`)),
                 ],
             });
@@ -93,7 +88,7 @@ class AlertModule extends modules_1.default {
         this.addChannel = (client, interaction, streamerNameField, streamerDescription, streamerId) => __awaiter(this, void 0, void 0, function* () {
             yield interaction.update({
                 embeds: [
-                    new discord_js_1.EmbedBuilder()
+                    new EmbedBuilder()
                         .setTitle("Configurer le module d'alerte")
                         .setDescription('Selectionnez un salon qui recevra les alertes.')
                         .setThumbnail(client.user.avatarURL())
@@ -104,14 +99,14 @@ class AlertModule extends modules_1.default {
                         .setColor('#f8e5fe'),
                 ],
                 components: [
-                    new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ChannelSelectMenuBuilder()
+                    new ActionRowBuilder().addComponents(new ChannelSelectMenuBuilder()
                         .setCustomId(`alert:comfirmAlert:${streamerNameField}:${streamerDescription}:${streamerId}`)
                         .setPlaceholder('Selectionnez un salon textuel')
-                        .setChannelTypes(discord_js_1.ChannelType.GuildAnnouncement, discord_js_1.ChannelType.GuildText)
+                        .setChannelTypes(ChannelType.GuildAnnouncement, ChannelType.GuildText)
                         .setDefaultChannels([])),
-                    new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder()
+                    new ActionRowBuilder().addComponents(new ButtonBuilder()
                         .setLabel('Retour')
-                        .setStyle(discord_js_1.ButtonStyle.Secondary)
+                        .setStyle(ButtonStyle.Secondary)
                         .setCustomId('alert:confirmUser')),
                 ],
             });
@@ -121,7 +116,7 @@ class AlertModule extends modules_1.default {
                 return;
             const loginId = streamerNameField;
             const channelId = interaction.values[0];
-            const { data, error } = yield supabase_1.supabase
+            const { data, error } = yield supabase
                 .from('alerts')
                 .insert({
                 guild_id: interaction.guild.id,
@@ -135,7 +130,7 @@ class AlertModule extends modules_1.default {
                 return console.log(error);
             yield interaction.update({
                 embeds: [
-                    new discord_js_1.EmbedBuilder()
+                    new EmbedBuilder()
                         .setTitle("Configurer le module d'alerte")
                         .setDescription('La configuration des alertes est terminée. 🎉')
                         .setThumbnail(client.user.avatarURL())
@@ -159,14 +154,14 @@ class AlertModule extends modules_1.default {
         this.addAlert = (data) => __awaiter(this, void 0, void 0, function* () {
             try {
                 // Vérifiez le type de la clé 'alerts'
-                const type = yield redis_1.redis.type('alerts');
+                const type = yield redis.type('alerts');
                 if (type !== 'set') {
                     if (type !== 'none') {
                         // La clé existe mais n'est pas du type 'set'
-                        yield redis_1.redis.del('alerts'); // Supprimez la clé s'il existe mais n'est pas un `set`
+                        yield redis.del('alerts'); // Supprimez la clé s'il existe mais n'est pas un `set`
                     }
                 }
-                yield redis_1.redis.sadd('alerts', JSON.stringify(data));
+                yield redis.sadd('alerts', JSON.stringify(data));
             }
             catch (error) {
                 console.error('Error adding data:', error);
@@ -181,12 +176,12 @@ class AlertModule extends modules_1.default {
                     return;
                 const streamerNames = streamerData.map((row) => row.login_id);
                 yield updateLiveStreamers(streamerNames);
-                const liveStreamers = yield redis_1.redis.hkeys('currentLiveStreamers');
+                const liveStreamers = yield redis.hkeys('currentLiveStreamers');
                 for (const streamer of liveStreamers) {
-                    const notified = yield redis_1.redis.sismember('notifiedStreamers', streamer);
+                    const notified = yield redis.sismember('notifiedStreamers', streamer);
                     if (!notified) {
-                        yield redis_1.redis.sadd('notifiedStreamers', streamer);
-                        const streamDataRaw = yield redis_1.redis.hget('currentLiveStreamers', streamer);
+                        yield redis.sadd('notifiedStreamers', streamer);
+                        const streamDataRaw = yield redis.hget('currentLiveStreamers', streamer);
                         if (!streamDataRaw)
                             return;
                         const streamData = JSON.parse(streamDataRaw);
@@ -198,7 +193,7 @@ class AlertModule extends modules_1.default {
                                 .replace('{width}', '1280')
                                 .replace('{height}', '720');
                             const pic = yield client.twitch.getProfilePicture(streamData.user_id);
-                            const embed = new discord_js_1.EmbedBuilder()
+                            const embed = new EmbedBuilder()
                                 .setTitle(streamData.title)
                                 .setAuthor({
                                 iconURL: pic,
@@ -227,9 +222,9 @@ class AlertModule extends modules_1.default {
                                 content: '',
                                 embeds: [embed],
                                 components: [
-                                    new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder()
+                                    new ActionRowBuilder().addComponents(new ButtonBuilder()
                                         .setLabel('Voir sur Twitch')
-                                        .setStyle(discord_js_1.ButtonStyle.Link)
+                                        .setStyle(ButtonStyle.Link)
                                         .setURL(`https://twitch.tv/${streamData.user_name}`)),
                                 ],
                             });
@@ -240,12 +235,12 @@ class AlertModule extends modules_1.default {
         }
         function updateLiveStreamers(streamerNames) {
             return __awaiter(this, void 0, void 0, function* () {
-                yield redis_1.redis.del('currentLiveStreamers');
+                yield redis.del('currentLiveStreamers');
                 for (let i = 0; i < streamerNames.length; i += 100) {
                     const streamersBatch = streamerNames.slice(i, i + 100);
                     const response = yield client.twitch.getStreamsById(streamersBatch);
                     for (const stream of response) {
-                        yield redis_1.redis.hset('currentLiveStreamers', stream.user_id, JSON.stringify(stream));
+                        yield redis.hset('currentLiveStreamers', stream.user_id, JSON.stringify(stream));
                     }
                 }
             });
@@ -257,7 +252,7 @@ class AlertModule extends modules_1.default {
             yield interaction.update({
                 content: '',
                 embeds: [
-                    new discord_js_1.EmbedBuilder()
+                    new EmbedBuilder()
                         .setTitle("Configurer le module d'alerte")
                         .setDescription('Ce module vous permet de cree des alertes de live Twitch.\n\n' +
                         '**Fonctionnalités du Module Alerte :**\n' +
@@ -271,16 +266,15 @@ class AlertModule extends modules_1.default {
                         .setColor('#f8e5fe'),
                 ],
                 components: [
-                    new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder()
+                    new ActionRowBuilder().addComponents(new ButtonBuilder()
                         .setLabel('Retour')
-                        .setStyle(discord_js_1.ButtonStyle.Secondary)
-                        .setCustomId('setup:showModules'), new discord_js_1.ButtonBuilder()
+                        .setStyle(ButtonStyle.Secondary)
+                        .setCustomId('setup:showModules'), new ButtonBuilder()
                         .setLabel('Configurer une alerte')
-                        .setStyle(discord_js_1.ButtonStyle.Success)
+                        .setStyle(ButtonStyle.Success)
                         .setCustomId('alert:showModal')),
                 ],
             });
         });
     }
 }
-exports.default = AlertModule;

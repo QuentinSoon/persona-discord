@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const commands_1 = require("../builders/commands");
-const commands_2 = require("../components/commands/commands");
-class PingCommand extends commands_2.SlashCommandComponent {
+import { SlashCommandBuilder } from '../builders/commands';
+import { SlashCommandComponent } from '../components/commands/commands';
+export default class PingCommand extends SlashCommandComponent {
     constructor() {
-        super(new commands_1.SlashCommandBuilder()
+        super(new SlashCommandBuilder()
             .setName('setup')
             .setDescription('Setup')
             .addModule('setup:setup'));
     }
 }
-exports.default = PingCommand;

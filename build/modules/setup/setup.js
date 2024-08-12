@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,13 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const discord_js_1 = require("discord.js");
-const modules_1 = __importDefault(require("../../components/modules/modules"));
-class SetupModule extends modules_1.default {
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, } from 'discord.js';
+import ModuleComponent from '../../components/modules/modules';
+export default class SetupModule extends ModuleComponent {
     constructor(client) {
         super(client, 'setup');
     }
@@ -24,7 +19,7 @@ class SetupModule extends modules_1.default {
                 content: '',
                 ephemeral: true,
                 embeds: [
-                    new discord_js_1.EmbedBuilder()
+                    new EmbedBuilder()
                         .setTitle('Configuration de Persona')
                         .setDescription(`Salut <@${interaction.user.id}> ! 👋 \n\n` +
                         'Persona est un bot avancé de modération automatique et manuelle, conçu pour les petites, moyennes et grandes communautés.\n\n' +
@@ -37,9 +32,9 @@ class SetupModule extends modules_1.default {
                         .setColor('#f8e5fe'),
                 ],
                 components: [
-                    new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder()
+                    new ActionRowBuilder().addComponents(new ButtonBuilder()
                         .setLabel('Commencer la Configuration')
-                        .setStyle(discord_js_1.ButtonStyle.Primary)
+                        .setStyle(ButtonStyle.Primary)
                         .setCustomId('setup:showModules')),
                 ],
             });
@@ -50,7 +45,7 @@ class SetupModule extends modules_1.default {
             yield interaction.update({
                 content: '',
                 embeds: [
-                    new discord_js_1.EmbedBuilder()
+                    new EmbedBuilder()
                         .setTitle('Configuration de Persona')
                         .setDescription('Persona propose un large éventail de modules pour optimiser votre serveur. Pour des performances optimales, il est recommandé de ne pas utiliser plusieurs bots offrant les mêmes fonctionnalités.\n\n' +
                         'Cliquez sur un module ci-dessous pour commencer la configuration de celui-ci.')
@@ -62,13 +57,12 @@ class SetupModule extends modules_1.default {
                         .setColor('#f8e5fe'),
                 ],
                 components: [
-                    new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder()
+                    new ActionRowBuilder().addComponents(new ButtonBuilder()
                         .setLabel('Alertes (Non configurer)')
-                        .setStyle(discord_js_1.ButtonStyle.Danger)
+                        .setStyle(ButtonStyle.Danger)
                         .setCustomId('alert:setup')),
                 ],
             });
         });
     }
 }
-exports.default = SetupModule;

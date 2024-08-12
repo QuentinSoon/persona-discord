@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,17 +7,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = __importDefault(require("axios"));
-require("dotenv/config");
-class TwitchAPI {
+import axios from 'axios';
+import 'dotenv/config';
+export default class TwitchAPI {
     constructor() { }
     getTwitchAccessToken() {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.post('https://id.twitch.tv/oauth2/token', null, {
+            const response = yield axios.post('https://id.twitch.tv/oauth2/token', null, {
                 params: {
                     client_id: process.env.TWITCH_CLIENT_ID,
                     client_secret: process.env.TWITCH_CLIENT_SECRET,
@@ -32,7 +27,7 @@ class TwitchAPI {
         return __awaiter(this, void 0, void 0, function* () {
             const token = yield this.getTwitchAccessToken();
             try {
-                const response = yield axios_1.default.get(`https://api.twitch.tv/helix/users?login=${userName}`, {
+                const response = yield axios.get(`https://api.twitch.tv/helix/users?login=${userName}`, {
                     headers: {
                         'Client-ID': process.env.TWITCH_CLIENT_ID,
                         Authorization: `Bearer ${token}`,
@@ -50,7 +45,7 @@ class TwitchAPI {
         return __awaiter(this, void 0, void 0, function* () {
             const token = yield this.getTwitchAccessToken();
             try {
-                const response = yield axios_1.default.get('https://api.twitch.tv/helix/streams?user_id=' +
+                const response = yield axios.get('https://api.twitch.tv/helix/streams?user_id=' +
                     userIds.join('&user_id='), {
                     headers: {
                         'Client-ID': process.env.TWITCH_CLIENT_ID,
@@ -69,7 +64,7 @@ class TwitchAPI {
         return __awaiter(this, void 0, void 0, function* () {
             const token = yield this.getTwitchAccessToken();
             try {
-                const response = yield axios_1.default.get(`https://api.twitch.tv/helix/users?id=${userId}`, {
+                const response = yield axios.get(`https://api.twitch.tv/helix/users?id=${userId}`, {
                     headers: {
                         'Client-ID': process.env.TWITCH_CLIENT_ID,
                         Authorization: `Bearer ${token}`,
@@ -84,4 +79,3 @@ class TwitchAPI {
         });
     }
 }
-exports.default = TwitchAPI;

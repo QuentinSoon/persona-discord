@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,12 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv/config");
-const redis_1 = require("../../utils/redis");
-const supabase_1 = require("../../utils/supabase");
-const types_1 = require("./types");
-class AlertClass {
+import 'dotenv/config';
+import { redis } from '../../utils/redis';
+import { supabase } from '../../utils/supabase';
+import { AlertsSchema } from './types';
+export default class AlertClass {
     constructor(client) {
         this.timeToCache = 24;
         this.client = client;
@@ -21,13 +19,13 @@ class AlertClass {
     getData() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const cachedData = yield redis_1.redis.smembers(`alerts`);
+                const cachedData = yield redis.smembers(`alerts`);
                 if (cachedData.length > 0) {
                     const parsedData = cachedData.map((alert) => JSON.parse(alert));
-                    const zodParsedData = types_1.AlertsSchema.parse(parsedData);
+                    const zodParsedData = AlertsSchema.parse(parsedData);
                     return zodParsedData;
                 }
-                const { data, error } = yield supabase_1.supabase
+                const { data, error } = yield supabase
                     .from('alerts')
                     .select('*')
                     .returns();
@@ -50,14 +48,14 @@ class AlertClass {
     addAlertsToSet(data) {
         return __awaiter(this, void 0, void 0, function* () {
             if (data && data.length > 0) {
-                const type = yield redis_1.redis.type('alerts');
+                const type = yield redis.type('alerts');
                 if (type !== 'set') {
                     if (type !== 'none') {
                         // La clé existe mais n'est pas un ensemble
-                        yield redis_1.redis.del('alerts'); // Supprimez la clé si elle existe mais n'est pas un ensemble
+                        yield redis.del('alerts'); // Supprimez la clé si elle existe mais n'est pas un ensemble
                     }
                 }
-                const pipeline = redis_1.redis.multi();
+                const pipeline = redis.multi();
                 data.forEach((alert) => {
                     pipeline.sadd('alerts', JSON.stringify(alert));
                 });
@@ -68,4 +66,3 @@ class AlertClass {
         });
     }
 }
-exports.default = AlertClass;
