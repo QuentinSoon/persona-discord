@@ -174,6 +174,7 @@ export default class AlertModule extends ModuleComponent {
                 const streamerData = yield client.cache.alert.getData();
                 if (!streamerData)
                     return;
+                console.log(streamerData);
                 const streamerNames = streamerData.map((row) => row.login_id);
                 yield updateLiveStreamers(streamerNames);
                 const liveStreamers = yield redis.hkeys('currentLiveStreamers');

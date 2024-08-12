@@ -32,6 +32,8 @@ export default class AlertModule extends ModuleComponent {
 
 			if (!streamerData) return;
 
+			console.log(streamerData);
+
 			const streamerNames = streamerData.map((row) => row.login_id);
 
 			await updateLiveStreamers(streamerNames);
