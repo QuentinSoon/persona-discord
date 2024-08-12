@@ -8,9 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 require("dotenv/config");
+const TwitchAPI_1 = __importDefault(require("../api/TwitchAPI"));
+const alert_1 = __importDefault(require("../modules/alert/alert"));
+const setup_1 = __importDefault(require("../modules/setup/setup"));
+const cache_1 = __importDefault(require("./cache"));
+const CommandHandler_1 = __importDefault(require("./handlers/CommandHandler"));
+const EventsHandler_1 = __importDefault(require("./handlers/EventsHandler"));
 class DiscordClient extends discord_js_1.Client {
     constructor() {
         super({
@@ -30,10 +39,23 @@ class DiscordClient extends discord_js_1.Client {
                 status: 'online',
             },
         });
+        this.collection = {
+            application_commands: new discord_js_1.Collection(),
+        };
+        this.rest_application_commands_array = [];
+        this.commands_handler = new CommandHandler_1.default(this);
+        this.events_handler = new EventsHandler_1.default(this);
+        this.cache = new cache_1.default(this);
+        this.setup = new setup_1.default(this);
+        this.alert = new alert_1.default(this);
+        this.twitch = new TwitchAPI_1.default();
         this.connect = () => __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log(`Attempting to connect to the Discord bot...`);
                 yield this.login(process.env.BOT_TOKEN);
+                yield this.commands_handler.load();
+                yield this.events_handler.load();
+                yield this.commands_handler.registerApplicationCommands();
             }
             catch (err) {
                 console.log('Failed to connect to the Discord bot');
