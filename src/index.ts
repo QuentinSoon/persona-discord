@@ -5,5 +5,3 @@ const client = new DiscordClient();
 (async () => {
 	await client.connect();
 })();
-
-module.exports = client;

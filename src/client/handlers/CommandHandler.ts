@@ -5,7 +5,6 @@ import { SlashCommandComponent } from '../../components/commands/commands';
 import { loadFiles } from '../../utils/files';
 
 const rest = new REST().setToken(process.env.BOT_TOKEN as string);
-const clientId: string = process.env.CLIENT_ID as string;
 
 export default class CommandsHandler {
 	client: DiscordClient;
@@ -54,13 +53,13 @@ export default class CommandsHandler {
 				`Started add ${this.client.rest_application_commands_array.length} application (/) commands.`
 			);
 
-			const data: any = await rest.put(
+			const data1: any = await rest.put(
 				Routes.applicationCommands(process.env.CLIENT_ID as string),
 				{
 					body: this.client.rest_application_commands_array,
 				}
 			);
-			console.log(`Successfully add ${data.length} application (/) commands.`);
+			console.log(`Successfully add ${data1.length} application (/) commands.`);
 		} catch (error) {
 			console.error(error);
 		}

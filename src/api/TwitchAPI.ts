@@ -19,6 +19,25 @@ export default class TwitchAPI {
 		return response.data.access_token;
 	}
 
+	async getUser(userName: string): Promise<Streamer | null> {
+		const token = await this.getTwitchAccessToken();
+		try {
+			const response = await axios.get(
+				`https://api.twitch.tv/helix/users?login=${userName}`,
+				{
+					headers: {
+						'Client-ID': process.env.TWITCH_CLIENT_ID,
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			return response.data.data[0];
+		} catch (error) {
+			console.log('Error occurred:', error);
+			return null;
+		}
+	}
+
 	async getStreamsById(userIds: string[]): Promise<any[]> {
 		const token = await this.getTwitchAccessToken();
 		try {
@@ -57,43 +76,18 @@ export default class TwitchAPI {
 			return '';
 		}
 	}
+}
 
-	async getUser(userName: string): Promise<{
-		id: string;
-		login: string;
-		display_name: string;
-		type: string;
-		broadcaster_type: string;
-		description: string;
-		profile_image_url: string;
-		offline_image_url: string;
-		view_count: number;
-		email: string;
-		created_at: string;
-	} | null> {
-		const token = await this.getTwitchAccessToken();
-		try {
-			const response = await axios.get(
-				`https://api.twitch.tv/helix/users?login=${userName}`,
-				{
-					headers: {
-						'Client-ID': process.env.TWITCH_CLIENT_ID,
-						Authorization: `Bearer ${token}`,
-					},
-				}
-			);
-			return response.data.data[0];
-		} catch (error) {
-			console.log('Error occurred:', error);
-			return null;
-		}
-	}
-
-	async getUserByName(userId: string): Promise<string> {
-		const user = await this.getUser(userId);
-		if (user) {
-			return user.display_name;
-		}
-		return '';
-	}
+export interface Streamer {
+	id: string;
+	login: string;
+	display_name: string;
+	type: string;
+	broadcaster_type: string;
+	description: string;
+	profile_image_url: string;
+	offline_image_url: string;
+	view_count: number;
+	email: string;
+	created_at: string;
 }

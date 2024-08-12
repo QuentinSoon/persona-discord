@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import DiscordClient from '../../client/DiscordClient';
+import { redis } from '../../utils/redis';
 import { supabase } from '../../utils/supabase';
 import { GuildSchema, GuildType } from './types';
 
@@ -13,7 +14,7 @@ export default class GuildClass {
 
 	async getData(guildId: string): Promise<GuildType | null> {
 		try {
-			const cachedData = await this.client.redis.get(`guild:${guildId}`);
+			const cachedData = await redis.get(`guild:${guildId}`);
 
 			if (cachedData) {
 				const parsedData = JSON.parse(cachedData);
@@ -32,7 +33,7 @@ export default class GuildClass {
 			}
 
 			if (data) {
-				await this.client.redis.set(
+				await redis.set(
 					`guild:${guildId}`,
 					JSON.stringify(data),
 					'EX',
@@ -41,7 +42,7 @@ export default class GuildClass {
 				return data;
 			}
 		} catch (error) {
-			// console.error('[ERROR] Failed to fetch data:', error);
+			console.error('[ERROR] Failed to fetch data:', error);
 		}
 
 		return null;
@@ -58,6 +59,7 @@ export default class GuildClass {
 				.insert({
 					guild_id: guildId,
 				})
+				.select()
 				.single();
 
 			if (error) {
@@ -65,7 +67,7 @@ export default class GuildClass {
 			}
 
 			if (data) {
-				await this.client.redis.set(
+				await redis.set(
 					`guild:${guildId}`,
 					JSON.stringify(data),
 					'EX',
@@ -74,7 +76,7 @@ export default class GuildClass {
 				return data;
 			}
 		} catch (error) {
-			// console.error('[ERROR] Failed to fetch data:', error);
+			console.error('[ERROR] Failed to fetch data:', error);
 		}
 
 		return null;
@@ -97,11 +99,11 @@ export default class GuildClass {
 			}
 
 			if (data) {
-				await this.client.redis.del(`guild:${guildId}`);
+				await redis.del(`guild:${guildId}`);
 				return data;
 			}
 		} catch (error) {
-			// console.error('[ERROR] Failed to fetch data:', error);
+			console.error('[ERROR] Failed to fetch data:', error);
 		}
 	}
 }

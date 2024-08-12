@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import DiscordClient from '../../client/DiscordClient';
+import { redis } from '../../utils/redis';
 import { supabase } from '../../utils/supabase';
 import { AlertsSchema, AlertsType } from './types';
 
@@ -13,10 +14,10 @@ export default class AlertClass {
 
 	async getData(): Promise<AlertsType | null> {
 		try {
-			const cachedData = await this.client.redis.get(`alerts`);
+			const cachedData = await redis.smembers(`alerts`);
 
-			if (cachedData) {
-				const parsedData = JSON.parse(cachedData);
+			if (cachedData.length > 0) {
+				const parsedData = cachedData.map((alert) => JSON.parse(alert));
 				const zodParsedData = AlertsSchema.parse(parsedData);
 				return zodParsedData;
 			}
@@ -31,7 +32,9 @@ export default class AlertClass {
 			}
 
 			if (data) {
-				await this.client.redis.set(`alerts`, JSON.stringify(data));
+				// console.log(data);
+				await this.addAlertsToSet(data);
+				// redis.set(`alerts`, JSON.stringify(data));
 				return data;
 			}
 		} catch (error) {
@@ -41,27 +44,22 @@ export default class AlertClass {
 		return null;
 	}
 
-	async updateData(name: string, value: any) {
-		try {
-			const cachedData = await this.getData();
-
-			if (!cachedData) return;
-
-			const { data, error } = await supabase
-				.from('alerts')
-				.update(value)
-				.eq('name', name);
-
-			if (error) {
-				throw error;
+	async addAlertsToSet(data: any[]) {
+		if (data && data.length > 0) {
+			const type = await redis.type('alerts');
+			if (type !== 'set') {
+				if (type !== 'none') {
+					// La clé existe mais n'est pas un ensemble
+					await redis.del('alerts'); // Supprimez la clé si elle existe mais n'est pas un ensemble
+				}
 			}
-
-			if (data) {
-				await this.client.redis.set(`alerts`, JSON.stringify(data));
-				return data;
-			}
-		} catch (error) {
-			// console.error('[ERROR] Failed to fetch data:', error);
+			const pipeline = redis.multi();
+			data.forEach((alert) => {
+				pipeline.sadd('alerts', JSON.stringify(alert));
+			});
+			await pipeline.exec();
+			return data;
 		}
+		return []; // Retourner une liste vide si `data` est vide ou non définie
 	}
 }

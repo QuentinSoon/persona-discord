@@ -10,7 +10,7 @@ export default abstract class EventComponent {
 		this._once = once;
 	}
 
-	abstract execute(client: DiscordClient, ...args: any[]);
+	abstract execute(client: DiscordClient, ...args: any[]): void;
 
 	get name(): string {
 		return this._name;

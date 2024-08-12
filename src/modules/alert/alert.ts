@@ -14,17 +14,19 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from 'discord.js';
+import { Streamer } from '../../api/TwitchAPI';
 import DiscordClient from '../../client/DiscordClient';
 import ModuleComponent from '../../components/modules/modules';
+import { redis } from '../../utils/redis';
 import { supabase } from '../../utils/supabase';
 
 export default class AlertModule extends ModuleComponent {
-	protected timeToCache: number = 0.05;
+	protected timeToCache: number = 3;
 
 	constructor(client: DiscordClient) {
 		super(client, 'alert');
 
-		async function checkStreamers() {
+		async function getStreamers() {
 			// Récupère tous les streamers de la base de données
 			const streamerData = await client.cache.alert.getData();
 
@@ -34,102 +36,87 @@ export default class AlertModule extends ModuleComponent {
 
 			await updateLiveStreamers(streamerNames);
 
-			// Obtenir les streamers en ligne depuis Redis
-			const liveStreamers = await client.redis.hkeys('currentLiveStreamers');
+			const liveStreamers = await redis.hkeys('currentLiveStreamers');
 
 			for (const streamer of liveStreamers) {
-				const notified = await client.redis.sismember(
-					'notifiedStreamers',
-					streamer
-				);
+				const notified = await redis.sismember('notifiedStreamers', streamer);
 
 				if (!notified) {
-					await client.redis.sadd('notifiedStreamers', streamer);
-					const streamDataRaw = await client.redis.hget(
+					await redis.sadd('notifiedStreamers', streamer);
+					const streamDataRaw = await redis.hget(
 						'currentLiveStreamers',
 						streamer
 					);
 					if (!streamDataRaw) return;
 					const streamData = JSON.parse(streamDataRaw);
-
-					// Envoyer une notification pour chaque guilde concernée
 					for (const data of streamerData.filter(
 						(row) => row.login_id === streamer
 					)) {
 						const channel = client.channels.cache.get(
 							data.channel_id ?? ''
 						) as TextChannel;
-						if (channel) {
-							console.log(streamData);
-							const thumbnail_url = streamData.thumbnail_url
-								.replace('{width}', '1280')
-								.replace('{height}', '720');
-							const pic = await client.twitch.getProfilePicture(
-								streamData.user_id
-							);
-							channel.send({
-								content: '',
-								embeds: [
-									new EmbedBuilder()
-										.setTitle(streamData.title)
-										.setAuthor({
-											iconURL: pic,
-											name: `${streamData.user_name} est en live sur Twitch !`,
-										})
-										.setURL(`https://twitch.tv/${streamData.user_name}`)
-										.setImage(thumbnail_url)
-										.addFields(
-											{
-												name: 'Jeu',
-												value: streamData.game_name ?? 'Aucun jeu',
-												inline: true,
-											},
-											{
-												name: 'Viewers',
-												value: streamData.viewer_count + '' ?? '0',
-												inline: true,
-											}
-										)
-										.setFooter({
-											text: 'Persona.app - Discord Bot',
-											iconURL: client.user!.avatarURL() as string,
-										})
-										.setColor('#f8e5fe'),
-								],
-								components: [
-									new ActionRowBuilder<ButtonBuilder>().addComponents(
-										new ButtonBuilder()
-											.setLabel('Voir sur Twitch')
-											.setStyle(ButtonStyle.Link)
-											.setURL(`https://twitch.tv/${streamData.user_name}`)
-									),
-								],
-							});
-						}
-					}
-				}
-			}
+						if (!channel) return;
+						const thumbnail_url = streamData.thumbnail_url
+							.replace('{width}', '1280')
+							.replace('{height}', '720');
+						const pic = await client.twitch.getProfilePicture(
+							streamData.user_id
+						);
 
-			// Retirer les streamers qui ne sont plus en ligne de Redis
-			const notifiedStreamers = await client.redis.smembers(
-				'notifiedStreamers'
-			);
-			for (const streamer of notifiedStreamers) {
-				if (!liveStreamers.includes(streamer)) {
-					await client.redis.srem('notifiedStreamers', streamer);
+						const embed = new EmbedBuilder()
+							.setTitle(streamData.title)
+							.setAuthor({
+								iconURL: pic,
+								name: `${streamData.user_name} est en live sur Twitch !`,
+							})
+							.setURL(`https://twitch.tv/${streamData.user_name}`)
+							.setImage(thumbnail_url)
+							.addFields(
+								{
+									name: 'Jeu',
+									value: streamData.game_name ?? 'Aucun jeu',
+									inline: true,
+								},
+								{
+									name: 'Viewers',
+									value: streamData.viewer_count + '' ?? '0',
+									inline: true,
+								}
+							)
+							.setFooter({
+								text: 'Persona.app - Discord Bot',
+								iconURL: client.user!.avatarURL() as string,
+							})
+							.setColor('#f8e5fe');
+						if (data.description) {
+							embed.setDescription(data.description);
+						}
+						channel.send({
+							content: '',
+							embeds: [embed],
+							components: [
+								new ActionRowBuilder<ButtonBuilder>().addComponents(
+									new ButtonBuilder()
+										.setLabel('Voir sur Twitch')
+										.setStyle(ButtonStyle.Link)
+										.setURL(`https://twitch.tv/${streamData.user_name}`)
+								),
+							],
+						});
+					}
 				}
 			}
 		}
 
-		async function updateLiveStreamers(streamerNames) {
-			await client.redis.del('currentLiveStreamers');
+		async function updateLiveStreamers(streamerNames: string[]) {
+			await redis.del('currentLiveStreamers');
 
 			for (let i = 0; i < streamerNames.length; i += 100) {
 				const streamersBatch = streamerNames.slice(i, i + 100);
 				const response = await client.twitch.getStreamsById(streamersBatch);
 
 				for (const stream of response) {
-					await client.redis.hset(
+					await redis.hset(
 						'currentLiveStreamers',
 						stream.user_id,
 						JSON.stringify(stream)
@@ -138,7 +125,7 @@ export default class AlertModule extends ModuleComponent {
 			}
 		}
 
-		setInterval(checkStreamers, this.timeToCache * 60 * 1000);
+		setInterval(getStreamers, this.timeToCache * 1000);
 	}
 
 	async setup(client: DiscordClient, interaction: ButtonInteraction) {
@@ -148,10 +135,9 @@ export default class AlertModule extends ModuleComponent {
 				new EmbedBuilder()
 					.setTitle("Configurer le module d'alerte")
 					.setDescription(
-						"Ce module vous permet de gérer efficacement les demandes d'assistance au sein de votre communauté.\n\n" +
-							'**Fonctionnalités du Module Tickets :**\n' +
-							'- Les utilisateurs peuvent créer des tickets directement depuis un canal dédié.\n' +
-							"- Les modérateurs ont accès à tous les tickets créés à partir d'un forum centralisé.\n\n" +
+						'Ce module vous permet de cree des alertes de live Twitch.\n\n' +
+							'**Fonctionnalités du Module Alerte :**\n' +
+							"- Lorsqu'un streamer est en live sur Twitch, une alerte est envoyée dans le salon de discussion.\n\n" +
 							'Pour commencer la configuration, appuyez sur le bouton ci-dessous. Suivez les instructions et configurez votre module selon vos besoins.'
 					)
 					.setThumbnail(client.user!.avatarURL())
@@ -166,11 +152,7 @@ export default class AlertModule extends ModuleComponent {
 					new ButtonBuilder()
 						.setLabel('Retour')
 						.setStyle(ButtonStyle.Secondary)
-						.setCustomId('panel:showModules'),
-					new ButtonBuilder()
-						.setLabel('Liste des alertes')
-						.setStyle(ButtonStyle.Primary)
-						.setCustomId('alert:listAlert'),
+						.setCustomId('setup:showModules'),
 					new ButtonBuilder()
 						.setLabel('Configurer une alerte')
 						.setStyle(ButtonStyle.Success)
@@ -196,7 +178,7 @@ export default class AlertModule extends ModuleComponent {
 					),
 					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
 						new TextInputBuilder()
-							.setLabel('Description du template')
+							.setLabel("Description dans l'alerte (Facultatif)")
 							.setCustomId('alert-modal-description')
 							.setPlaceholder('PersonaApp est en stream! 🚀 @everyone')
 							.setStyle(TextInputStyle.Paragraph)
@@ -212,9 +194,10 @@ export default class AlertModule extends ModuleComponent {
 	) => {
 		if (!interaction.guild) return;
 		const guildId = interaction.guild.id;
-		let streamerName: any;
-		let streamerNameField = '';
-		let streamerDescription = '';
+
+		let streamerData: Streamer | null = null;
+		let streamerNameField: string = '';
+		let streamerDescription: string = '';
 
 		if (interaction.isModalSubmit()) {
 			const field: ModalSubmitInteraction = interaction;
@@ -222,33 +205,34 @@ export default class AlertModule extends ModuleComponent {
 			streamerDescription = field.fields.getTextInputValue(
 				'alert-modal-description'
 			);
-			streamerName = await client.twitch.getUser(streamerNameField);
-			streamerNameField = streamerName.id;
+			streamerData = await client.twitch.getUser(streamerNameField);
 		}
+
+		if (!streamerData) return;
 
 		await interaction.update({
 			embeds: [
 				new EmbedBuilder()
 					.setTitle("Configurer le module d'alerte")
-					.setDescription(`La personne est elle bien ce streamer ?`)
+					.setDescription(`Est-ce que la personne est bien ce streamer ?`)
 					.setFields(
 						{
 							name: 'Nom',
-							value: streamerName.display_name,
+							value: streamerData.display_name,
 							inline: true,
 						},
 						{
 							name: 'ID',
-							value: streamerName.id,
+							value: streamerData.id,
 							inline: true,
 						},
 						{
 							name: 'Description',
-							value: streamerName.description,
+							value: streamerData.description,
 							inline: false,
 						}
 					)
-					.setThumbnail(streamerName.profile_image_url)
+					.setThumbnail(streamerData.profile_image_url)
 					.setFooter({
 						text: 'Persona.app - Discord Bot',
 						iconURL: client.user!.avatarURL() as string,
@@ -269,7 +253,7 @@ export default class AlertModule extends ModuleComponent {
 						.setLabel('Oui')
 						.setStyle(ButtonStyle.Success)
 						.setCustomId(
-							`alert:addChannel:${streamerNameField}:${streamerDescription}`
+							`alert:addChannel:${streamerNameField}:${streamerDescription}:${streamerData.id}`
 						)
 				),
 			],
@@ -280,7 +264,8 @@ export default class AlertModule extends ModuleComponent {
 		client: DiscordClient,
 		interaction: ButtonInteraction,
 		streamerNameField: string,
-		streamerDescription: string
+		streamerDescription: string,
+		streamerId: string
 	) => {
 		await interaction.update({
 			embeds: [
@@ -298,11 +283,12 @@ export default class AlertModule extends ModuleComponent {
 				new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
 					new ChannelSelectMenuBuilder()
 						.setCustomId(
-							`alert:comfirmAlert:${streamerNameField}:${streamerDescription}`
+							`alert:comfirmAlert:${streamerNameField}:${streamerDescription}:${streamerId}`
 						)
 						.setPlaceholder('Selectionnez un salon textuel')
 						.setChannelTypes(
-							ChannelType.GuildAnnouncement | ChannelType.GuildText
+							ChannelType.GuildAnnouncement,
+							ChannelType.GuildText
 						)
 						.setDefaultChannels([])
 				),
@@ -320,21 +306,23 @@ export default class AlertModule extends ModuleComponent {
 		client: DiscordClient,
 		interaction: ChannelSelectMenuInteraction,
 		streamerNameField: string,
-		streamerDescription: string
+		streamerDescription: string,
+		streamerId: string
 	) => {
+		if (!interaction.guild) return;
 		const loginId = streamerNameField;
 		const channelId = interaction.values[0];
 
-		console.log(loginId + ':' + channelId);
-		const { data, error } = await supabase.from('alerts').insert({
-			guild_id: interaction.guild?.id,
-			login_id: loginId,
-			channel_id: channelId,
-			description: streamerDescription,
-			type: 'twitch',
-		});
-		// add alert to redis (notifiedStreamers)
-		await client.redis.sadd('notifiedStreamers', loginId);
+		const { data, error } = await supabase
+			.from('alerts')
+			.insert({
+				guild_id: interaction.guild.id,
+				login_id: streamerId,
+				channel_id: channelId,
+				description: streamerDescription,
+			})
+			.select()
+			.single();
 
 		if (error) return console.log(error);
 
@@ -352,5 +340,31 @@ export default class AlertModule extends ModuleComponent {
 			],
 			components: [],
 		});
+
+		// add alert to redis (alerts)
+		try {
+			// await redis.sadd('alerts', JSON.stringify(data));
+			this.addAlert(data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	addAlert = async (data: any) => {
+		try {
+			// Vérifiez le type de la clé 'alerts'
+			const type = await redis.type('alerts');
+
+			if (type !== 'set') {
+				if (type !== 'none') {
+					// La clé existe mais n'est pas du type 'set'
+					await redis.del('alerts'); // Supprimez la clé s'il existe mais n'est pas un `set`
+				}
+			}
+
+			await redis.sadd('alerts', JSON.stringify(data));
+		} catch (error) {
+			console.error('Error adding data:', error);
+		}
 	};
 }

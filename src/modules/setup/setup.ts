@@ -9,9 +9,9 @@ import {
 import DiscordClient from '../../client/DiscordClient';
 import ModuleComponent from '../../components/modules/modules';
 
-export default class PanelModule extends ModuleComponent {
+export default class SetupModule extends ModuleComponent {
 	constructor(client: DiscordClient) {
-		super(client, 'panel');
+		super(client, 'setup');
 	}
 
 	async setup(client: DiscordClient, interaction: ChatInputCommandInteraction) {
@@ -20,11 +20,11 @@ export default class PanelModule extends ModuleComponent {
 			ephemeral: true,
 			embeds: [
 				new EmbedBuilder()
-					.setTitle('Initialisation de Persona')
+					.setTitle('Configuration de Persona')
 					.setDescription(
 						`Salut <@${interaction.user.id}> ! 👋 \n\n` +
 							'Persona est un bot avancé de modération automatique et manuelle, conçu pour les petites, moyennes et grandes communautés.\n\n' +
-							'Persona est là pour vous aider à maintenir un environnement sûr et agréable. Pour commencer la configuration, veuillez appuyer sur le bouton ci-dessous.'
+							'Ce bot est là pour vous aider à maintenir un environnement sûr et agréable. Pour commencer la configuration, veuillez appuyer sur le bouton ci-dessous.'
 					)
 					.setThumbnail(client.user!.avatarURL())
 					.setFooter({
@@ -38,7 +38,7 @@ export default class PanelModule extends ModuleComponent {
 					new ButtonBuilder()
 						.setLabel('Commencer la Configuration')
 						.setStyle(ButtonStyle.Primary)
-						.setCustomId('panel:showModules')
+						.setCustomId('setup:showModules')
 				),
 			],
 		});
@@ -49,7 +49,7 @@ export default class PanelModule extends ModuleComponent {
 			content: '',
 			embeds: [
 				new EmbedBuilder()
-					.setTitle('Initialisation de Persona')
+					.setTitle('Configuration de Persona')
 					.setDescription(
 						'Persona propose un large éventail de modules pour optimiser votre serveur. Pour des performances optimales, il est recommandé de ne pas utiliser plusieurs bots offrant les mêmes fonctionnalités.\n\n' +
 							'Cliquez sur un module ci-dessous pour commencer la configuration de celui-ci.'

@@ -1,27 +1,23 @@
 {
 	"name": "persona-discord",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Advanced automatic and manual moderation bot designed for small, medium and large communities.",
 	"main": "src/index.ts",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
-		"run": "node --trace-warnings src/index.ts",
-		"shard": "node --trace-warnings src/shard.ts",
-		"build": "tsc --build"
+		"start": "node build/index.js",
+		"build": "tsc"
 	},
 	"keywords": [],
-	"author": "QuentinSoon",
+	"author": "QuentinSpace",
 	"license": "MIT",
 	"dependencies": {
-		"@supabase/supabase-js": "^2.45.0",
-		"axios": "^1.7.2",
+		"@supabase/supabase-js": "^2.45.1",
+		"axios": "^1.7.3",
 		"discord.js": "^14.15.3",
 		"dotenv": "^16.4.5",
-		"fs": "0.0.1-security",
 		"ioredis": "^5.4.1",
-		"path": "^0.12.7",
-		"tsx": "^4.16.2",
-		"typescript": "^5.5.4",
+		"tsx": "^4.17.0",
 		"zod": "^3.23.8"
 	}
 }
