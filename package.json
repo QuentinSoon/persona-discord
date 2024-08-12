@@ -1,12 +1,12 @@
 {
 	"name": "persona-discord",
 	"version": "1.0.0",
-	"type": "module",
 	"description": "Advanced automatic and manual moderation bot designed for small, medium and large communities.",
 	"main": "src/index.ts",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
-		"start": "ts-node src/index.ts"
+		"start": "node dist/index.js",
+		"build": "tsc"
 	},
 	"keywords": [],
 	"author": "QuentinSpace",
