@@ -14,12 +14,10 @@ export default abstract class ModuleComponent {
 			Events.InteractionCreate,
 			async (interaction: Interaction) => {
 				if (interaction.isButton()) {
-					console.log('Button');
 					if (!interaction.customId.startsWith(this._name)) return;
 					await this.execute(interaction.customId, client, interaction);
 				}
 				if (interaction.isChatInputCommand()) {
-					console.log('ChatInputCommand');
 					const command: SlashCommandComponent | undefined =
 						client.collection.application_commands.get(interaction.commandName);
 					if (!command) return;
@@ -28,12 +26,10 @@ export default abstract class ModuleComponent {
 					this.execute(command.data.modules, client, interaction);
 				}
 				if (interaction.isModalSubmit()) {
-					console.log('ModalSubmit');
 					if (!interaction.customId.startsWith(this._name)) return;
 					this.execute(interaction.customId, client, interaction);
 				}
 				if (interaction.isChannelSelectMenu()) {
-					console.log('ModalSubmit');
 					if (!interaction.customId.startsWith(this._name)) return;
 					this.execute(interaction.customId, client, interaction);
 				}

@@ -206,7 +206,6 @@ export default class AlertModule extends ModuleComponent {
 				'alert-modal-description'
 			);
 			streamerData = await client.twitch.getUser(streamerNameField);
-			console.log(streamerData);
 		}
 
 		if (!streamerData)
