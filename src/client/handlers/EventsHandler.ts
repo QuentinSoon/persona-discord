@@ -14,7 +14,6 @@ export default class EventsHandler {
 		try {
 			const files = await loadFiles('../../events/');
 			for (const file of files) {
-				// const { default: Event } = await import(`../events/${file}`);
 				const { default: Event } = await import(path.join(file));
 				console.log(`Imported Event from file ${file}:`, Event);
 				if (typeof Event !== 'function') {

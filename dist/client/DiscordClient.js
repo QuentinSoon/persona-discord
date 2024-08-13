@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 require("dotenv/config");
+const CommandHandler_1 = __importDefault(require("./handlers/CommandHandler"));
 const EventsHandler_1 = __importDefault(require("./handlers/EventsHandler"));
 class DiscordClient extends discord_js_1.Client {
     constructor() {
@@ -34,11 +35,18 @@ class DiscordClient extends discord_js_1.Client {
                 status: 'online',
             },
         });
+        this.collection = {
+            application_commands: new discord_js_1.Collection(),
+        };
+        this.rest_application_commands_array = [];
+        this.commands_handler = new CommandHandler_1.default(this);
         this.events_handler = new EventsHandler_1.default(this);
         this.connect = () => __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log(`Attempting to connect to the Discord bot...`);
+                yield this.commands_handler.load();
                 yield this.events_handler.load();
+                yield this.commands_handler.registerApplicationCommands();
                 yield this.login(process.env.BOT_TOKEN);
                 console.log('Successfully connected to the Discord bot!');
             }
