@@ -7,7 +7,7 @@ export const loadFiles = async (dir: string): Promise<string[]> => {
 		fileList: string[] = []
 	): Promise<string[]> => {
 		const files = await fs.promises.readdir(path.join(__filename, dir));
-		console.log(files);
+		// console.log(files);
 		for (const file of files) {
 			const filePath = path.join(path.join(__filename, dir), file);
 			const stat = await fs.promises.stat(filePath);

@@ -15,7 +15,7 @@ export default class EventsHandler {
 			const files = await loadFiles('../../events/');
 			for (const file of files) {
 				const { default: Event } = await import(path.join(file));
-				console.log(`Imported Event from file ${file}:`, Event);
+				// console.log(`Imported Event from file ${file}:`, Event);
 				if (typeof Event !== 'function') {
 					console.error(
 						`Failed to load event from file ${file}: Not a constructor`
@@ -32,7 +32,7 @@ export default class EventsHandler {
 					} else {
 						this.client.on(event.name, event.execute.bind(event, this.client));
 					}
-					console.log(`Loaded event ${event.name}`);
+					// console.log(`Loaded event ${event.name}`);
 				} else {
 					console.error(
 						`Event from file ${file} is not an instance of DiscordEvent`

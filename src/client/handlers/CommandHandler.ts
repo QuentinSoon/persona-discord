@@ -19,7 +19,7 @@ export default class CommandsHandler {
 			const files = await loadFiles('../../commands/');
 			for (const file of files) {
 				const { default: Command } = await import(path.join(file));
-				console.log(`Imported Command from file ${file}:`, Command);
+				// console.log(`Imported Command from file ${file}:`, Command);
 				if (typeof Event !== 'function') {
 					console.error(
 						`Failed to load command from file ${file}: Not a constructor`

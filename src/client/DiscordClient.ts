@@ -1,6 +1,7 @@
 import { ActivityType, Client, Collection, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
 import { SlashCommandComponent } from '../components/commands';
+import SetupModule from '../modules/panel';
 import CommandsHandler from './handlers/CommandHandler';
 import EventsHandler from './handlers/EventsHandler';
 
@@ -12,6 +13,8 @@ export default class DiscordClient extends Client {
 
 	commands_handler = new CommandsHandler(this);
 	events_handler = new EventsHandler(this);
+
+	setup = new SetupModule(this);
 
 	constructor() {
 		super({
