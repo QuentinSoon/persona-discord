@@ -14,6 +14,8 @@ export default class SetupModule extends ModuleComponent {
 	}
 
 	async setup(client: DiscordClient, interaction: ChatInputCommandInteraction) {
+		if (!interaction.guild) return;
+
 		await interaction.reply({
 			content: '',
 			ephemeral: true,
