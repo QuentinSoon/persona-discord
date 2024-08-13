@@ -1,6 +1,8 @@
 import { ActivityType, Client, Collection, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
+import TwitchAPI from '../api/TwitchAPI';
 import { SlashCommandComponent } from '../components/commands';
+import AlertModule from '../modules/alert';
 import SetupModule from '../modules/setup';
 import Cache from './cache/cache';
 import CommandsHandler from './handlers/CommandHandler';
@@ -17,7 +19,10 @@ export default class DiscordClient extends Client {
 
 	cache = new Cache(this);
 
+	twitch = new TwitchAPI();
+
 	setup = new SetupModule(this);
+	alert = new AlertModule(this);
 
 	constructor() {
 		super({
