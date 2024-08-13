@@ -30,7 +30,7 @@ export default class DiscordClient extends Client {
 				'Successfully connected to the Discord bot! ' + process.env.CLIENT_ID
 			);
 		} catch (err) {
-			console.log('Failed to connect to the Discord bot :', err);
+			console.log('Failed to connect to the Discord bot : =? ', err);
 		}
 	};
 }
