@@ -26,6 +26,9 @@ export default class DiscordClient extends Client {
 		try {
 			console.log(`Attempting to connect to the Discord bot...`);
 			await this.login(process.env.BOT_TOKEN);
+			console.log(
+				'Successfully connected to the Discord bot! ' + process.env.CLIENT_ID
+			);
 		} catch (err) {
 			console.log('Failed to connect to the Discord bot :', err);
 		}
