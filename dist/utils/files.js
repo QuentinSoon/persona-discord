@@ -17,17 +17,16 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const loadFiles = (dir) => __awaiter(void 0, void 0, void 0, function* () {
     const getTsFiles = (dir_1, ...args_1) => __awaiter(void 0, [dir_1, ...args_1], void 0, function* (dir, fileList = []) {
-        const files = yield fs_1.default.promises.readdir(dir);
+        const files = yield fs_1.default.promises.readdir(path_1.default.join(__filename, dir));
         console.log(files);
         for (const file of files) {
-            const filePath = path_1.default.join(dir, file);
+            const filePath = path_1.default.join(path_1.default.join(__filename, dir), file);
             const stat = yield fs_1.default.promises.stat(filePath);
             if (stat.isDirectory()) {
                 yield getTsFiles(filePath, fileList);
             }
             else if (file.endsWith('.ts') || file.endsWith('.js')) {
                 fileList.push(filePath);
-                console.log(filePath);
             }
         }
         return fileList;

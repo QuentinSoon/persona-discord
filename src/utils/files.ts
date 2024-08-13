@@ -6,19 +6,17 @@ export const loadFiles = async (dir: string): Promise<string[]> => {
 		dir: string,
 		fileList: string[] = []
 	): Promise<string[]> => {
-		const files = await fs.promises.readdir(dir);
+		const files = await fs.promises.readdir(path.join(__filename, dir));
 		console.log(files);
 		for (const file of files) {
-			const filePath = path.join(dir, file);
+			const filePath = path.join(path.join(__filename, dir), file);
 			const stat = await fs.promises.stat(filePath);
 			if (stat.isDirectory()) {
 				await getTsFiles(filePath, fileList);
 			} else if (file.endsWith('.ts') || file.endsWith('.js')) {
 				fileList.push(filePath);
-				console.log(filePath);
 			}
 		}
-
 		return fileList;
 	};
 	try {
