@@ -36,7 +36,7 @@ class DiscordClient extends discord_js_1.Client {
                 yield this.login(process.env.BOT_TOKEN);
             }
             catch (err) {
-                console.log('Failed to connect to the Discord bot');
+                console.log('Failed to connect to the Discord bot :', err);
             }
         });
     }
