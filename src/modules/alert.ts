@@ -155,7 +155,7 @@ export default class AlertModule extends ModuleComponent {
 						.setCustomId('setup:showModules'),
 					new ButtonBuilder()
 						.setLabel('Configurer une alerte')
-						.setStyle(ButtonStyle.Success)
+						.setStyle(ButtonStyle.Primary)
 						.setCustomId('alert:showModal')
 				),
 			],

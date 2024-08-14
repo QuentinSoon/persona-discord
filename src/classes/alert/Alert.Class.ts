@@ -62,4 +62,10 @@ export default class AlertClass {
 		}
 		return []; // Retourner une liste vide si `data` est vide ou non définie
 	}
+
+	async hasAlert(guildId: string): Promise<boolean> {
+		const alerts = await this.getData();
+		if (!alerts) return false;
+		return alerts.some((alert) => alert.guild_id === guildId);
+	}
 }

@@ -47,6 +47,10 @@ export default class SetupModule extends ModuleComponent {
 	}
 
 	async showModules(client: DiscordClient, interaction: ButtonInteraction) {
+		if (!interaction.guild) return;
+		const hasAlert: boolean = await client.cache.alert.hasAlert(
+			interaction.guild.id
+		);
 		await interaction.update({
 			content: '',
 			embeds: [
@@ -66,8 +70,8 @@ export default class SetupModule extends ModuleComponent {
 			components: [
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder()
-						.setLabel('Alertes (Non configurer)')
-						.setStyle(ButtonStyle.Danger)
+						.setLabel(`Alertes (${hasAlert ? 'Configurer' : 'Non configurer'})`)
+						.setStyle(hasAlert ? ButtonStyle.Success : ButtonStyle.Danger)
 						.setCustomId('alert:setup')
 				),
 			],

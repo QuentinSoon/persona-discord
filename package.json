@@ -1,6 +1,6 @@
 {
 	"name": "persona-discord",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Advanced automatic and manual moderation bot designed for small, medium and large communities.",
 	"main": "src/index.ts",
 	"scripts": {
