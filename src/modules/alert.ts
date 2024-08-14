@@ -21,12 +21,12 @@ import { redis } from '../utils/redis';
 import { supabase } from '../utils/supabase';
 
 export default class AlertModule extends ModuleComponent {
-	protected timeToCache: number = 60;
+	protected timeToCache: number = 1;
 
 	constructor(client: DiscordClient) {
 		super(client, 'alert');
 
-		setInterval(getStreamers, this.timeToCache * 1000);
+		setInterval(getStreamers, this.timeToCache * 60 * 1000);
 
 		async function getStreamers() {
 			// Récupère tous les streamers de la base de données

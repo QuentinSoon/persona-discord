@@ -5,5 +5,5 @@ export const redis = new Redis({
 	port: Number(process.env.REDIS_PORT as string),
 	username: process.env.REDIS_USERNAME as string,
 	password: process.env.REDIS_PASSWORD as string,
-	db: 1,
+	db: Number(process.env.REDIS_DB as string),
 });
