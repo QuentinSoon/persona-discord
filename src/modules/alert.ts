@@ -21,7 +21,7 @@ import { redis } from '../utils/redis';
 import { supabase } from '../utils/supabase';
 
 export default class AlertModule extends ModuleComponent {
-	protected timeToCache: number = 30;
+	protected timeToCache: number = 60;
 
 	constructor(client: DiscordClient) {
 		super(client, 'alert');
@@ -90,11 +90,9 @@ export default class AlertModule extends ModuleComponent {
 								iconURL: client.user!.avatarURL() as string,
 							})
 							.setColor('#f8e5fe');
-						if (data.description) {
-							embed.setDescription(data.description);
-						}
+
 						channel.send({
-							content: '',
+							content: data.description + '',
 							embeds: [embed],
 							components: [
 								new ActionRowBuilder<ButtonBuilder>().addComponents(
